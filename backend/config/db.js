@@ -11,10 +11,8 @@ const pool = mysql.createPool({
   }
 });
 
-// Use promise wrapper
 const promisePool = pool.promise();
 
-// Test connection
 promisePool.getConnection()
   .then(conn => {
     console.log("✅ DATABASE CONNECTED");
