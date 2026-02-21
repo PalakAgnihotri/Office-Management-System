@@ -1,0 +1,125 @@
+import { useEffect, useState } from "react";
+import API from "../services/api";
+import AdminLayout from "../layouts/AdminLayout";
+
+function TaskAllotment() {
+  const [tasks, setTasks] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [showTasks, setShowTasks] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState("");
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      const res = await API.get("/tasks/pending");
+      const pendingTasks = res.data.filter(
+        (task) => task.status !== "Completed"
+      );
+      setTasks(pendingTasks);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchEmployees = async () => {
+    try {
+      const res = await API.get("/users/employees");
+      setEmployees(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleAssign = async (taskId) => {
+    if (!selectedEmployee) return alert("Select employee first");
+
+    try {
+      await API.put(`/tasks/update/${taskId}`, {
+        assigned_to: selectedEmployee,
+        status: "In-progress",
+      });
+
+      alert("Task Assigned Successfully");
+      setSelectedTaskId(null);
+      setSelectedEmployee("");
+      fetchTasks();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  return (
+    <AdminLayout>
+      <h1 className="text-2xl font-bold mb-6">Task Allotment</h1>
+
+      <button
+        onClick={() => {
+          fetchTasks();
+          setShowTasks(true);
+        }}
+        className="bg-purple-600 text-white px-6 py-2 rounded-lg mb-6"
+      >
+        Show Tasks
+      </button>
+
+      {showTasks && (
+        <div className="space-y-4">
+          {tasks.map((task) => (
+            <div
+              key={task.id}
+              className="bg-white p-5 rounded-xl shadow"
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="font-semibold text-lg">{task.title}</h2>
+                  <p className="text-sm text-gray-600">
+                    Priority: {task.priority} | Status: {task.status}
+                  </p>
+                </div>
+
+                {selectedTaskId !== task.id ? (
+                  <button
+                    onClick={() => setSelectedTaskId(task.id)}
+                    className="bg-cyan-600 text-white px-4 py-2 rounded-lg"
+                  >
+                    Assign
+                  </button>
+                ) : (
+                  <div className="flex gap-3 items-center">
+                    <select
+                      value={selectedEmployee}
+                      onChange={(e) =>
+                        setSelectedEmployee(e.target.value)
+                      }
+                      className="border p-2 rounded-lg"
+                    >
+                      <option value="">Select Employee</option>
+                      {employees.map((emp) => (
+                        <option key={emp.id} value={emp.id}>
+                          {emp.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    <button
+                      onClick={() => handleAssign(task.id)}
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg"
+                    >
+                      Confirm
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </AdminLayout>
+  );
+}
+
+export default TaskAllotment;
