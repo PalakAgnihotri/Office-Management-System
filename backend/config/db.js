@@ -5,3 +5,11 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME
 });
+pool.getConnection()
+  .then(conn => {
+    console.log("✅ DATABASE CONNECTED");
+    conn.release();
+  })
+  .catch(err => {
+    console.error("❌ DATABASE CONNECTION FAILED:", err);
+  });
