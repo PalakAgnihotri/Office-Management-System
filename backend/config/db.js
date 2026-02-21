@@ -5,13 +5,17 @@ const pool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT, 
+  port: process.env.DB_PORT,
   ssl: {
     rejectUnauthorized: false
   }
 });
 
-pool.getConnection()
+// Use promise wrapper
+const promisePool = pool.promise();
+
+// Test connection
+promisePool.getConnection()
   .then(conn => {
     console.log("✅ DATABASE CONNECTED");
     conn.release();
@@ -20,4 +24,4 @@ pool.getConnection()
     console.error("❌ DATABASE CONNECTION FAILED:", err);
   });
 
-module.exports = pool.promise();
+module.exports = promisePool;
