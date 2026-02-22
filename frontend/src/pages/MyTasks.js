@@ -27,7 +27,25 @@ function MyTasks() {
 
     setTasks(res.data);
   };
+const handleMarkComplete = async (taskId) => {
+  try {
+    await axios.put(
+  `http://localhost:5000/api/tasks/employee/${taskId}`,
+  { status: "Completed" },
+  {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  }
+);
 
+    alert("Task marked as completed");
+    fetchTasks(); // refresh list
+  } catch (error) {
+    console.error(error);
+    alert("Failed to update task");
+  }
+};
   const handleUpdate = async (id) => {
     try {
       await axios.put(
@@ -124,39 +142,50 @@ function MyTasks() {
                 </td>
 
                 {/* Action */}
+                
                 <td className="p-4 text-center space-x-2">
-                  {editingId === task.id ? (
-                    <>
-                      <button
-                        onClick={() => handleUpdate(task.id)}
-                        className="bg-green-500 text-white px-3 py-1 rounded"
-                      >
-                        Save
-                      </button>
+  {editingId === task.id ? (
+    <>
+      <button
+        onClick={() => handleUpdate(task.id)}
+        className="bg-green-500 text-white px-3 py-1 rounded"
+      >
+        Save
+      </button>
 
-                      <button
-                        onClick={() => setEditingId(null)}
-                        className="bg-gray-400 text-white px-3 py-1 rounded"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setEditingId(task.id);
-                        setEditData({
-                          status: task.status,
-                          allotted_hours:
-                            task.allotted_hours || ""
-                        });
-                      }}
-                      className="bg-blue-500 text-white px-3 py-1 rounded"
-                    >
-                      Edit
-                    </button>
-                  )}
-                </td>
+      <button
+        onClick={() => setEditingId(null)}
+        className="bg-gray-400 text-white px-3 py-1 rounded"
+      >
+        Cancel
+      </button>
+    </>
+  ) : (
+    <>
+      {task.status !== "Completed" && (
+        <button
+          onClick={() => handleMarkComplete(task.id)}
+          className="bg-green-500 text-white px-3 py-1 rounded"
+        >
+          Mark as Completed
+        </button>
+      )}
+
+      <button
+        onClick={() => {
+          setEditingId(task.id);
+          setEditData({
+            status: task.status,
+            allotted_hours: task.allotted_hours || ""
+          });
+        }}
+        className="bg-blue-500 text-white px-3 py-1 rounded"
+      >
+        Edit
+      </button>
+    </>
+  )}
+</td>
 
               </tr>
             ))}
