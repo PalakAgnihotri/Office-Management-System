@@ -4,157 +4,138 @@ import AdminLayout from "../layouts/AdminLayout";
 
 function TaskDevelopment() {
   const [tasks, setTasks] = useState([]);
-  const [updates, setUpdates] = useState([]);
-  const [taskName, setTaskName] = useState("");
-  const [notes, setNotes] = useState("");
-  const [search, setSearch] = useState("");
+  const [newTask, setNewTask] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [editValue, setEditValue] = useState("");
 
   useEffect(() => {
-    fetchMyTasks();
+    fetchTasks();
   }, []);
 
-  const fetchMyTasks = async () => {
-    try {
-      const res = await API.get("/tasks/all");
-      setTasks(res.data);
-    } catch (err) {
-      console.log(err);
-    }
+  const fetchTasks = async () => {
+    const res = await API.get("/tasks/all");
+    setTasks(res.data);
   };
-
-  const fetchUpdates = async (taskId) => {
-    try {
-      const res = await API.get(`/tasks/updates/${taskId}`);
-      setUpdates(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleSave = async () => {
-  if (!taskName.trim() || !notes.trim()) {
-    alert("Fill all fields");
-    return;
-  }
-
-  // Find task by name from employee's assigned tasks
-  const matchedTask = tasks.find(
-    (task) =>
-      task.title.toLowerCase().trim() ===
-      taskName.toLowerCase().trim()
-  );
-
-  if (!matchedTask) {
-    alert("Task not found");
-    return;
-  }
+  const handleDelete = async (id) => {
+  const confirmDelete = window.confirm("Are you sure you want to delete this task?");
+  if (!confirmDelete) return;
 
   try {
-    await API.post(`/tasks/update-with-comment/${matchedTask.id}`, {
-      status: "In-progress",
-      comment: notes
-    });
-
-    alert("Development Saved");
-    setNotes("");
-    fetchUpdates(matchedTask.id);
-  } catch (err) {
-    console.log(err);
+    await API.delete(`/tasks/${id}`);
+    fetchTasks();
+  } catch (error) {
+    console.error(error);
+    alert("Failed to delete task");
   }
 };
 
+  const handleAddTask = async () => {
+    if (!newTask.trim()) return alert("Enter task name");
 
-  const filteredUpdates = updates.filter((u) =>
-    u.comment?.toLowerCase().includes(search.toLowerCase())
-  );
+    await API.post("/tasks/create", {
+      title: newTask,
+      description: "",
+      priority: "Medium",
+      due_date: null,
+      assigned_to: null
+    });
+
+    setNewTask("");
+    fetchTasks();
+  };
+
+  const handleEdit = (task) => {
+    setEditingId(task.id);
+    setEditValue(task.title);
+  };
+
+  const handleSaveEdit = async (id) => {
+    await API.put(`/tasks/edit/${id}`, {
+      title: editValue
+    });
+
+    setEditingId(null);
+    fetchTasks();
+  };
 
   return (
     <AdminLayout>
       <h1 className="text-2xl font-bold mb-6">Task Development</h1>
 
-      {/* FORM */}
-      <div className="bg-white p-6 rounded-xl shadow mb-8">
-
-
-        {/* Name Task */}
-        <label className="block font-medium mb-2">Name Task</label>
-            <input
-                 type="text"
-  value={taskName}
-  onChange={(e) => setTaskName(e.target.value)}
-  placeholder="Enter task name"
-  className="w-full border p-3 rounded-lg mb-6"
-            />
-
-
-        <label className="block font-medium mb-2">
-          Notes / Progress
-        </label>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Describe progress"
-          className="w-full border p-4 rounded-lg mb-6 h-28"
+      {/* Add Task Block */}
+      <div className="bg-white p-6 rounded-xl shadow mb-8 flex gap-4">
+        <input
+          type="text"
+          value={newTask}
+          onChange={(e) => setNewTask(e.target.value)}
+          placeholder="Enter new task name"
+          className="border p-3 rounded-lg flex-1"
         />
-
-        <div className="flex gap-4">
-          <button
-            onClick={handleSave}
-            className="bg-purple-600 text-white px-6 py-2 rounded-lg"
-          >
-            Save Development
-          </button>
-
-          <button
-            onClick={() => setNotes("")}
-            className="border px-6 py-2 rounded-lg"
-          >
-            Clear
-          </button>
-        </div>
+        <button
+          onClick={handleAddTask}
+          className="bg-purple-600 text-white px-6 py-2 rounded-lg"
+        >
+          Add Task
+        </button>
       </div>
 
-      {/* TABLE */}
+      {/* Task List */}
       <div className="bg-white p-6 rounded-xl shadow">
-
-        <div className="flex justify-between mb-6">
-          <input
-            type="text"
-            placeholder="Search development..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border p-3 rounded-lg w-1/2"
-          />
-
-          <div className="flex gap-3">
-            <button className="border px-4 py-2 rounded-lg">
-              Export CSV
-            </button>
-            <button className="border px-4 py-2 rounded-lg">
-              Export PDF
-            </button>
-          </div>
-        </div>
-
         <table className="w-full text-left">
           <thead>
             <tr className="border-b">
-              <th className="py-3">Name Task</th>
-              <th>Notes</th>
-              <th>Date</th>
+              <th className="py-3">Task Name</th>
+              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
+
           <tbody>
-            {filteredUpdates.map((update) => (
-              <tr key={update.id} className="border-b">
-                <td className="py-3">{update.task_title}</td>
-                <td>{update.comment}</td>
-                <td>
-                  {new Date(update.created_at).toLocaleDateString()}
+            {tasks.map((task) => (
+              <tr key={task.id} className="border-b">
+                <td className="py-3">
+                  {editingId === task.id ? (
+                    <input
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      className="border p-2 rounded"
+                    />
+                  ) : (
+                    task.title
+                  )}
                 </td>
-                <td className="text-red-500 cursor-pointer">
-                  Delete
+
+                <td>{task.status}</td>
+
+                <td>
+                  {editingId === task.id ? (
+                    <>
+                      <button
+                        onClick={() => handleSaveEdit(task.id)}
+                        className="bg-green-500 text-white px-3 py-1 rounded mr-2"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="bg-gray-400 text-white px-3 py-1 rounded"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => handleEdit(task)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded"
+                    >
+                      Edit
+                    </button>
+
+                  )}
+                  <button onClick={()=> handleDelete(task.id)
+                  }
+                  className="bg-red-700 text-white px-3 py-1 rounded"> Delete
+                  </button>
                 </td>
               </tr>
             ))}

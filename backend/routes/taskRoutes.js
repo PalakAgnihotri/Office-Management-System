@@ -9,15 +9,17 @@ router.post("/create", verifyToken, isAdmin, taskController.createTask);
 router.get("/all", verifyToken, isAdmin, taskController.getAllTasks);
 router.get("/pending", verifyToken, isAdmin, taskController.getPendingTasks);
 router.put("/:id", verifyToken, isAdmin, taskController.updateTask);
+router.put("/edit/:id", verifyToken, isAdmin, taskController.editTaskName);
+router.put("/assign/:id", verifyToken, isAdmin, taskController.assignTask);
+router.get("/assigned", verifyToken, isAdmin, taskController.getAssignedTasks);
 // Employee routes
 router.get("/my", verifyToken, taskController.getMyTasks);
 router.get("/my-tasks", verifyToken, taskController.getMyTasks);
 router.put("/employee/:id", verifyToken, taskController.updateTaskByEmployee);
 router.put("/update/:id", verifyToken, taskController.updateTaskStatus);
-router.put("/:id", verifyToken, taskController.updateTask);
-
+router.delete("/:id", verifyToken, isAdmin, taskController.deleteTask);
 router.post("/update-with-comment/:id", verifyToken, taskController.addTaskUpdate);
-
+router.get("/entry",verifyToken, taskController.getEntryTasks);
 // Task updates history
 router.get("/updates/:taskId", verifyToken, async (req, res) => {
   try {
@@ -38,6 +40,5 @@ router.get("/updates/:taskId", verifyToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-router.delete("/:id",verifyToken,taskController.deleteTask)
 
 module.exports = router;

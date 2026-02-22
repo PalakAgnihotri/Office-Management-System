@@ -2,33 +2,16 @@ const db = require("../config/db");
 
 const createTask = async (req, res) => {
   try {
+    const { title } = req.body;
 
-    const {
-      title,
-      client,
-      priority,
-      status,
-      due_date,
-      assigned_to,
-      allotted_hours
-    } = req.body;
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: "Title is required" });
+    }
 
-    const sql = `
-      INSERT INTO tasks
-      (title, client, priority, status, due_date, assigned_to, created_by,allotted_hours)
-      VALUES (?, ?, ?, ?, ?, ?, ?,?)
-    `;
-
-    await db.execute(sql, [
-      title || null,
-      client || null,
-      priority || "Medium",
-      status || "Pending",
-      due_date || null,
-      assigned_to || null,
-      allotted_hours || null,
-      req.user.id
-    ]);
+    await db.execute(
+      "INSERT INTO tasks (title, created_by) VALUES (?, ?)",
+      [title, req.user?.id || null]
+    );
 
     res.status(201).json({ message: "Task created successfully" });
 
@@ -40,18 +23,27 @@ const createTask = async (req, res) => {
 
 const getAllTasks = async (req, res) => {
   try {
+
     const [tasks] = await db.execute(`
-      SELECT tasks.*, users.name AS employee_name
-      FROM tasks
-      LEFT JOIN users ON tasks.assigned_to = users.id
-    `);
+  SELECT 
+    t.id,
+    t.title,
+    t.priority,
+    t.status,
+    t.due_date,
+    t.allotted_hours,
+    u.name AS employee_name
+  FROM tasks t
+  LEFT JOIN users u ON t.assigned_to = u.id
+  ORDER BY t.id DESC
+`);
 
     res.json(tasks);
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 const getMyTasks = async (req, res) => {
   try {
     console.log("Logged Employee ID:", req.user.id);
@@ -68,30 +60,31 @@ const getMyTasks = async (req, res) => {
 
 const updateTask = async (req, res) => {
   try {
-
     const taskId = req.params.id;
-
-    const title = req.body.title || null;
-    const client = req.body.client || null;
-    const priority = req.body.priority || "Medium";
-    const status = req.body.status || "Pending";
-    const due_date = req.body.due_date || null;
-    const allotted_hours =
-      req.body.allotted_hours !== undefined
-        ? req.body.allotted_hours
-        : null;
+    const { priority, status, due_date, allotted_hours, employee_id } = req.body;
 
     await db.execute(
       `UPDATE tasks 
-       SET title=?, client=?, priority=?, status=?, due_date=?, allotted_hours=? 
-       WHERE id=?`,
-      [title, client, priority, status, due_date, allotted_hours, taskId]
+       SET priority = ?, 
+           status = ?, 
+           due_date = ?, 
+           allotted_hours = ?,
+           assigned_to = ?
+       WHERE id = ?`,
+      [
+        priority || "Medium",
+        status || "Pending",
+        due_date || null,
+        allotted_hours !== undefined ? allotted_hours : null,
+        employee_id !== undefined ? employee_id : null,
+        taskId
+      ]
     );
 
     res.json({ message: "Task updated successfully" });
 
   } catch (error) {
-    console.error(error);
+    console.error("UPDATE ERROR:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -152,6 +145,8 @@ const getPendingTasks = async (req, res) => {
 };
 const deleteTask = async (req, res) => {
   try {
+    console.log("Deleting task:", req.params.id);
+
     const taskId = req.params.id;
 
     await db.execute(
@@ -162,6 +157,7 @@ const deleteTask = async (req, res) => {
     res.json({ message: "Task deleted successfully" });
 
   } catch (error) {
+    console.log("DELETE ERROR:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -189,7 +185,74 @@ const updateTaskByEmployee = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+const editTaskName = async (req, res) => {
+  try {
+    const { title } = req.body;
+    const taskId = req.params.id;
 
+    await db.execute(
+      "UPDATE tasks SET title = ? WHERE id = ?",
+      [title, taskId]
+    );
+
+    res.json({ message: "Task updated successfully" });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const assignTask = async (req, res) => {
+  try {
+    const { employeeId, allotted_hours } = req.body;
+    const taskId = req.params.id;
+
+    await db.execute(
+      "UPDATE tasks SET assigned_to = ?, allotted_hours = ? WHERE id = ?",
+      [
+        employeeId || null,
+        allotted_hours || null,
+        taskId
+      ]
+    );
+
+    res.json({ message: "Task assigned successfully" });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getAssignedTasks = async (req, res) => {
+  try {
+    const [tasks] = await db.execute(
+      "SELECT * FROM tasks WHERE assigned_to IS NOT NULL"
+    );
+
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getEntryTasks = async (req, res) => {
+  try {
+    const [tasks] = await db.execute(`
+      SELECT t.id,
+             t.title,
+             t.priority,
+             t.status,
+             t.due_date,
+             t.allotted_hours,
+             t.assigned_to,
+             u.name AS employee_name
+      FROM tasks t
+      LEFT JOIN users u ON t.assigned_to = u.id
+      WHERE t.assigned_to IS NOT NULL
+    `);
+
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 module.exports = {
   createTask,
   getAllTasks,
@@ -199,5 +262,9 @@ module.exports = {
   addTaskUpdate,
   getPendingTasks,
   deleteTask,
-  updateTaskByEmployee
+  updateTaskByEmployee,
+  editTaskName,
+  assignTask,
+  getAssignedTasks,
+  getEntryTasks
 };
