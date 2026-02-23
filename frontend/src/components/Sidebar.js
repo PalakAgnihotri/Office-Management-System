@@ -85,10 +85,10 @@ function Sidebar({ role, onLogout, closeSidebar }) {
       </ul>
 
       {/* Logout (Common for Both) */}
-      <div className="pt-10">
+      <div className="p-6 border-t">
         <button
           onClick={onLogout}
-          className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition"
+          className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl transition"
         >
           Logout
         </button>
