@@ -9,7 +9,7 @@ function Sidebar({ role, onLogout, closeSidebar }) {
   };
 
   return (
-    <div className="h-full p-6 h-screen bg-white">
+    <div className="h-screen flex flex-col bg-gray-100 p-6">
 
       <h2 className="text-2xl font-bold text-purple-600 mb-10">
         TaskFlow
@@ -85,10 +85,10 @@ function Sidebar({ role, onLogout, closeSidebar }) {
       </ul>
 
       {/* Logout (Common for Both) */}
-      <div className="p-6 border-t">
+      <div className="mt-auto">
         <button
           onClick={onLogout}
-          className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl transition"
+          className=" bg-red-500 text-white py-2 px-6 rounded-lg">
         >
           Logout
         </button>
