@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import EmployeeLayout from "../layouts/EmployeeLayout";
-
+import API from "../services/api";
 function MyTasks() {
   const [tasks, setTasks] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -16,21 +15,16 @@ function MyTasks() {
   }, []);
 
   const fetchTasks = async () => {
-    const res = await axios.get(
-      "http://localhost:5000/api/tasks/my-tasks",
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
-        }
-      }
-    );
-
+  try {
+    const res = await API.get("/tasks/my-tasks");
     setTasks(res.data);
-  };
+  } catch (err) {
+    console.error("FETCH TASK ERROR:", err);
+  }
+};
 const handleMarkComplete = async (taskId) => {
   try {
-    await axios.put(
-  `http://localhost:5000/api/tasks/employee/${taskId}`,
+    await API.put(`/tasks/employee/${taskId}`,
   { status: "Completed" },
   {
     headers: {
@@ -48,8 +42,7 @@ const handleMarkComplete = async (taskId) => {
 };
   const handleUpdate = async (id) => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/tasks/employee/${id}`,
+      await API.put(`/tasks/employee/${id}`,
         {
           status: editData.status,
           allotted_hours:

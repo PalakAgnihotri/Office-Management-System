@@ -33,7 +33,7 @@ function Settings() {
 
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-bold mb-6">Settings</h1>
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6">Settings</h1>
       <p className="text-gray-500 mb-6">Manage your preferences</p>
 
       {/* THEME CARD */}

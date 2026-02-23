@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const employeeController = require("../controllers/employeeController");
-
+const { getProfile } = require("../controllers/employeeController");
+const { verifyToken } = require("../middleware/authMiddleware");
 router.post("/", employeeController.createEmployee);
 router.get("/", employeeController.getAllEmployees);
 router.delete("/:id", employeeController.deleteEmployee);
-
+router.get("/profile", verifyToken, getProfile);
 module.exports = router;

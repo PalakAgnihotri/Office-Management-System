@@ -11,22 +11,42 @@ function EmployeeMaster() {
   const [designation, setDesignation] = useState("");
   const [joiningDate, setJoiningDate] = useState("");
   const [search, setSearch] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     fetchEmployees();
   }, []);
 
+  // const fetchEmployees = async () => {
+  //   const res = await API.get("/employees");
+  //   setEmployees(res.data);
+  // };
   const fetchEmployees = async () => {
+  try {
     const res = await API.get("/employees");
-    setEmployees(res.data);
-  };
+
+    if (Array.isArray(res.data)) {
+      setEmployees(res.data);
+    } else if (Array.isArray(res.data.employees)) {
+      setEmployees(res.data.employees);
+    } else {
+      console.error("Unexpected response:", res.data);
+      setEmployees([]);
+    }
+
+  } catch (err) {
+    console.error("EMPLOYEE FETCH ERROR:", err.response?.data || err);
+    setEmployees([]);
+  }
+};
 
   const handleSave = async () => {
-    if (!name || !email) return alert("Name and Email required");
+    if (!name || !email ||!password) return alert("Name, Email and Password required");
 
     await API.post("/employees", {
       name,
       email,
+      password,
       phone,
       department,
       designation,
@@ -54,7 +74,7 @@ function EmployeeMaster() {
 
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-bold mb-6">Employee Master</h1>
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6">Employee Master</h1>
 
       {/* FORM */}
       <div className="bg-white p-6 rounded-xl shadow mb-8">
@@ -72,6 +92,13 @@ function EmployeeMaster() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+        <label className="block mb-2">Password</label>
+<input
+  type="password"
+  className="w-full border p-3 rounded-lg mb-4"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+/>
 
         <label className="block mb-2">Phone</label>
         <input
@@ -114,6 +141,7 @@ function EmployeeMaster() {
             onClick={() => {
               setName("");
               setEmail("");
+              setPassword("");
               setPhone("");
               setDepartment("");
               setDesignation("");
@@ -127,46 +155,88 @@ function EmployeeMaster() {
       </div>
 
       {/* TABLE */}
-      <div className="bg-white p-6 rounded-xl shadow">
+      {/* EMPLOYEE LIST */}
+<div className="bg-white p-4 sm:p-6 rounded-2xl shadow">
 
-        <div className="flex justify-between mb-6">
-          <input
-            type="text"
-            placeholder="Search employees..."
-            className="border p-3 rounded-lg w-1/2"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+  <input
+    type="text"
+    placeholder="Search employees..."
+    className="border p-3 rounded-lg w-full sm:w-1/2 mb-6"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+  />
+
+  {/* ================= MOBILE VIEW (CARDS) ================= */}
+  <div className="sm:hidden space-y-4">
+    {filtered.map((emp) => (
+      <div
+        key={emp.id}
+        className="border rounded-xl p-4 shadow-sm bg-gray-50"
+      >
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="font-semibold text-lg">
+            {emp.name}
+          </h2>
+          <span className="text-xs bg-teal-100 text-teal-600 px-2 py-1 rounded-full">
+            {emp.designation || "Employee"}
+          </span>
         </div>
 
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b">
-              <th className="py-3">Name</th>
-              <th>Email</th>
-              <th>Department</th>
-              <th>Designation</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((emp) => (
-              <tr key={emp.id} className="border-b">
-                <td className="py-3">{emp.name}</td>
-                <td>{emp.email}</td>
-                <td>{emp.department}</td>
-                <td>{emp.designation}</td>
-                <td
-                  className="text-red-500 cursor-pointer"
-                  onClick={() => handleDelete(emp.id)}
-                >
-                  Delete
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="text-sm space-y-1">
+          <p><strong>Email:</strong> {emp.email}</p>
+          <p><strong>Phone:</strong> {emp.phone || "-"}</p>
+          <p><strong>Department:</strong> {emp.department || "-"}</p>
+        </div>
+
+        <button
+          onClick={() => handleDelete(emp.id)}
+          className="text-red-600 mt-4 font-medium"
+        >
+          Delete Employee
+        </button>
       </div>
+    ))}
+  </div>
+
+  {/* ================= DESKTOP TABLE ================= */}
+  <div className="hidden sm:block overflow-x-auto">
+    <table className="w-full text-left border-collapse">
+      <thead>
+        <tr className="border-b bg-gray-50 text-gray-600 text-sm uppercase">
+          <th className="py-3 px-2">Name</th>
+          <th className="px-2">Email</th>
+          <th className="px-2">Phone</th>
+          <th className="px-2">Department</th>
+          <th className="px-2">Designation</th>
+          <th className="px-2">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {filtered.map((emp) => (
+          <tr
+            key={emp.id}
+            className="border-b hover:bg-gray-50 transition"
+          >
+            <td className="py-3 px-2 font-medium">
+              {emp.name}
+            </td>
+            <td className="px-2">{emp.email}</td>
+            <td className="px-2">{emp.phone || "-"}</td>
+            <td className="px-2">{emp.department || "-"}</td>
+            <td className="px-2">{emp.designation || "-"}</td>
+            <td
+              onClick={() => handleDelete(emp.id)}
+              className="px-2 text-red-600 cursor-pointer hover:underline"
+            >
+              Delete
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
     </AdminLayout>
   );
 }

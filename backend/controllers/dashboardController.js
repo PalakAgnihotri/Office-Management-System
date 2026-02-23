@@ -3,43 +3,41 @@ const db = require("../config/db");
 // 🟢 ADMIN DASHBOARD
 const getAdminDashboard = async (req, res) => {
   try {
-    // Total Tasks
-    const [total] = await db.execute("SELECT COUNT(*) AS total FROM tasks");
-
-    // Completed Tasks
-    const [completed] = await db.execute(
-      "SELECT COUNT(*) AS completed FROM tasks WHERE status = 'Completed'"
+    const [[total]] = await db.execute(
+      "SELECT COUNT(*) AS count FROM tasks"
     );
 
-    // Pending Tasks
-    const [pending] = await db.execute(
-      "SELECT COUNT(*) AS pending FROM tasks WHERE status = 'Pending'"
+    const [[completed]] = await db.execute(
+      "SELECT COUNT(*) AS count FROM tasks WHERE status = 'Completed'"
     );
 
-    // Overdue Tasks
-    const [overdue] = await db.execute(
-      "SELECT COUNT(*) AS overdue FROM tasks WHERE due_date < CURDATE() AND status != 'Completed'"
+    const [[pending]] = await db.execute(
+      "SELECT COUNT(*) AS count FROM tasks WHERE status = 'Pending'"
     );
 
-    // Employee Productivity
+    const [[overdue]] = await db.execute(
+      "SELECT COUNT(*) AS count FROM tasks WHERE due_date < CURDATE() AND status != 'Completed'"
+    );
+
     const [productivity] = await db.execute(`
-      SELECT users.name, COUNT(tasks.id) AS completed_tasks
-      FROM users
-      LEFT JOIN tasks ON users.id = tasks.assigned_to 
-      AND tasks.status = 'Completed'
-      WHERE users.role = 'employee'
-      GROUP BY users.id
+      SELECT e.name, COUNT(t.id) AS completed_tasks
+      FROM employees e
+      LEFT JOIN tasks t 
+        ON e.id = t.assigned_to 
+        AND t.status = 'Completed'
+      GROUP BY e.id
     `);
 
     res.json({
-      totalTasks: total[0].total,
-      completedTasks: completed[0].completed,
-      pendingTasks: pending[0].pending,
-      overdueTasks: overdue[0].overdue,
+      totalTasks: total.count,
+      completedTasks: completed.count,
+      pendingTasks: pending.count,
+      overdueTasks: overdue.count,
       employeeProductivity: productivity
     });
 
   } catch (error) {
+    console.error("DASHBOARD ERROR:", error);
     res.status(500).json({ error: error.message });
   }
 };

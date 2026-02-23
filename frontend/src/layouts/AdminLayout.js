@@ -26,17 +26,15 @@ function AdminLayout({ children }) {
         <h1 className="text-purple-600 font-bold">TaskFlow</h1>
       </div>
 
-      <div className="flex">
+      <div className="flex flex-row w-full">
 
         {/* Sidebar */}
-        <div
-          className={`
-            fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-50
-            transform transition-transform duration-300
-            ${isOpen ? "translate-x-0" : "-translate-x-full"}
-            md:static md:translate-x-0
-          `}
-        >
+        <div className={`
+  fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-50
+  transform transition-transform duration-300
+  ${isOpen ? "translate-x-0" : "-translate-x-full"}
+  md:relative md:translate-x-0 md:block
+`}>
           <Sidebar
             role={role}
             onLogout={handleLogout}
@@ -53,7 +51,7 @@ function AdminLayout({ children }) {
         )}
 
         {/* Main Content */}
-        <div className="flex-1 p-6 md:p-10">
+        <div className="flex-1 w-full p-4 sm:p-6 md:p-8 overflow-x-hidden">
           {children}
         </div>
 

@@ -14,12 +14,15 @@ function AdminDashboard() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    API.get("/dashboard/admin")
-      .then(res => setData(res.data))
-      .catch(err => console.log(err));
-  }, []);
+  API.get("/dashboard/admin")
+    .then(res => setData(res.data))
+    .catch(err => {
+      console.error("ADMIN DASHBOARD ERROR:", err.response?.data || err);
+      setData({}); 
+    });
+}, []);
 
-  if (!data) return <h2 className="text-black p-8">Loading...</h2>;
+  if (!data) return <h2 className="text-black p-4 sm:p-6 lg:p-8">Loading...</h2>;
   const chartData = [
   { name: "Total", value: data.totalTasks },
   { name: "Pending", value: data.pendingTasks },
@@ -35,25 +38,25 @@ function AdminDashboard() {
 
   <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg">
     <p className="text-sm opacity-80">Total Tasks</p>
-    <h2 className="text-3xl font-bold mt-2">{data.totalTasks}</h2>
+    <h2 className="text-3xl font-bold mt-2">{data.totalTasks ?? 0}</h2>
   </div>
 
   <div className="bg-gradient-to-r from-pink-500 to-pink-600 text-white p-6 rounded-2xl shadow-lg">
     <p className="text-sm opacity-80">Pending</p>
-    <h2 className="text-3xl font-bold mt-2">{data.pendingTasks}</h2>
+    <h2 className="text-3xl font-bold mt-2">{data.pendingTasks ?? 0}</h2>
   </div>
 
   <div className="bg-gradient-to-r from-teal-500 to-teal-600 text-white p-6 rounded-2xl shadow-lg">
     <p className="text-sm opacity-80">Completed</p>
-    <h2 className="text-3xl font-bold mt-2">{data.completedTasks}</h2>
+    <h2 className="text-3xl font-bold mt-2">{data.completedTasks ?? 0}</h2>
   </div>
 
   <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-2xl shadow-lg">
     <p className="text-sm opacity-80">Overdue</p>
-    <h2 className="text-3xl font-bold mt-2">{data.overdueTasks}</h2>
+    <h2 className="text-3xl font-bold mt-2">{data.overdueTasks ?? 0}</h2>
   </div>
   {/* Graph Section */}
-<div className="bg-white p-8 rounded-2xl shadow-xl mt-12 w-full">
+<div className="bg-white p-4 sm:p-6 lg:p-4 sm:p-6 lg:p-8 rounded-2xl shadow-xl mt-8 w-full">
   <h2 className="text-2xl font-bold mb-8">Task Statistics</h2>
 
   <div className="w-full h-[400px]">

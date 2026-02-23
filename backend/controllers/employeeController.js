@@ -1,21 +1,23 @@
 const db = require("../config/db");
-
+const bcrypt = require("bcryptjs");
 // Create employee
 const createEmployee = async (req, res) => {
   try {
-    const { name, email, phone, department, designation, joining_date } = req.body;
+    const { name, email, password, phone, department, designation, joining_date } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     await db.execute(
       `INSERT INTO employees 
-       (name, email, phone, department, designation, joining_date)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [name, email, phone, department, designation, joining_date || null ]
+       (name, email, password, phone, department, designation, joining_date)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [name, email, hashedPassword,phone, department, designation, joining_date ]
     );
 
-    res.status(201).json({ message: "Employee added successfully" });
-  } catch (error) {
-    console.log("ERROR CREATE EMPLOYEE:", error);
-    res.status(500).json({ error: error.message });
+    res.json({ message: "Employee created successfully" });
+
+  } catch (err) {
+    console.error("CREATE EMPLOYEE ERROR:", err);
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -45,9 +47,27 @@ const deleteEmployee = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const getProfile = async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      "SELECT id, name, email, phone, department, designation, joining_date FROM employees WHERE id = ?",
+      [req.user.id]
+    );
 
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    res.json(rows[0]);
+
+  } catch (error) {
+    console.log("PROFILE ERROR:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 module.exports = {
   createEmployee,
   getAllEmployees,
-  deleteEmployee
+  deleteEmployee,
+  getProfile
 };
