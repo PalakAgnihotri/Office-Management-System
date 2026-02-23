@@ -9,7 +9,7 @@ function Sidebar({ role, onLogout, closeSidebar }) {
   };
 
   return (
-    <div className="h-full p-6 bg-white">
+    <div className="h-full p-6 h-screen bg-white">
 
       <h2 className="text-2xl font-bold text-purple-600 mb-10">
         TaskFlow
