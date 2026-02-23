@@ -76,6 +76,9 @@ function Sidebar({ role, onLogout, closeSidebar }) {
             <li onClick={() => handleNavigate("/my-tasks")} className="hover:text-purple-600 cursor-pointer">
               My Tasks
             </li>
+            <li onClick={() => handleNavigate("/employees/profile")} className="hover:text-purple-600 cursor-pointer">
+              My Profile
+            </li>
           </>
         )}
 

@@ -53,7 +53,7 @@ function CourierInward() {
 
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-bold mb-6">
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6">
         Courier Inward Entry
       </h1>
 
@@ -110,49 +110,92 @@ function CourierInward() {
       </div>
 
       {/* TABLE */}
-      <div className="bg-white p-6 rounded-xl shadow">
-        <input
-          type="text"
-          placeholder="Search inward..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border p-3 rounded-lg mb-6 w-1/2"
-        />
+      {/* INWARD LIST */}
+<div className="bg-white p-4 sm:p-6 rounded-2xl shadow">
 
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b">
-              <th>No</th>
-              <th>From</th>
-              <th>Received By</th>
-              <th>Remarks</th>
-              <th>Date</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((item) => (
-              <tr key={item.id} className="border-b">
-                <td>{item.courier_no}</td>
-                <td>{item.sender}</td>
-                <td>{item.received_by}</td>
-                <td>{item.remarks}</td>
-                <td>
-                  {new Date(item.created_at).toLocaleDateString()}
-                </td>
-                <td>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="text-red-500"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+  <input
+    type="text"
+    placeholder="Search inward..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="border p-3 rounded-lg w-full sm:w-1/2 mb-6"
+  />
+
+  {/* ================= MOBILE VIEW (CARDS) ================= */}
+  <div className="sm:hidden space-y-4">
+    {filtered.map((item) => (
+      <div
+        key={item.id}
+        className="border rounded-xl p-4 shadow-sm bg-gray-50"
+      >
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="font-semibold text-lg">
+            #{item.courier_no}
+          </h2>
+          <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
+            {new Date(item.created_at).toLocaleDateString()}
+          </span>
+        </div>
+
+        <div className="text-sm space-y-1">
+          <p><strong>From:</strong> {item.sender}</p>
+          <p><strong>Received By:</strong> {item.received_by}</p>
+          <p><strong>Remarks:</strong> {item.remarks || "-"}</p>
+        </div>
+
+        <button
+          onClick={() => handleDelete(item.id)}
+          className="text-red-600 mt-4 font-medium"
+        >
+          Delete Entry
+        </button>
       </div>
+    ))}
+  </div>
+
+  {/* ================= DESKTOP TABLE ================= */}
+  <div className="hidden sm:block overflow-x-auto">
+    <table className="w-full text-left border-collapse">
+      <thead>
+        <tr className="border-b bg-gray-50 text-gray-600 text-sm uppercase">
+          <th className="py-3 px-2">Courier No</th>
+          <th className="px-2">From</th>
+          <th className="px-2">Received By</th>
+          <th className="px-2">Remarks</th>
+          <th className="px-2">Date</th>
+          <th className="px-2">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {filtered.map((item) => (
+          <tr
+            key={item.id}
+            className="border-b hover:bg-gray-50 transition"
+          >
+            <td className="py-3 px-2 font-medium">
+              {item.courier_no}
+            </td>
+            <td className="px-2">{item.sender}</td>
+            <td className="px-2">{item.received_by}</td>
+            <td className="px-2">{item.remarks || "-"}</td>
+            <td className="px-2">
+              {new Date(item.created_at).toLocaleDateString()}
+            </td>
+            <td>
+              <button
+                onClick={() => handleDelete(item.id)}
+                className="text-red-600 hover:underline"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
     </AdminLayout>
   );
 }

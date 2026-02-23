@@ -4,144 +4,321 @@ import AdminLayout from "../layouts/AdminLayout";
 
 function TaskDevelopment() {
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState("");
+  const [employees, setEmployees] = useState([]);
+  const [search, setSearch] = useState("");
   const [editingId, setEditingId] = useState(null);
-  const [editValue, setEditValue] = useState("");
+
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    employee_id: "",
+    priority: "Medium",
+    status: "Pending",
+    dueDate: "",
+    allottedHours: ""
+  });
 
   useEffect(() => {
     fetchTasks();
+    fetchEmployees();
   }, []);
 
   const fetchTasks = async () => {
-    const res = await API.get("/tasks/all");
+    const res = await API.get("/development/all");
     setTasks(res.data);
   };
-  const handleDelete = async (id) => {
-  const confirmDelete = window.confirm("Are you sure you want to delete this task?");
-  if (!confirmDelete) return;
 
-  try {
-    await API.delete(`/tasks/${id}`);
-    fetchTasks();
-  } catch (error) {
-    console.error(error);
-    alert("Failed to delete task");
-  }
-};
+  const fetchEmployees = async () => {
+    const res = await API.get("/employees");
+    setEmployees(res.data);
+  };
 
-  const handleAddTask = async () => {
-    if (!newTask.trim()) return alert("Enter task name");
+  const handleSave = async () => {
+    try {
+      const payload = {
+        title: form.title,
+        description: form.description,
+        priority: form.priority,
+        status: form.status,
+        due_date: form.dueDate || null,
+        allotted_hours: form.allottedHours || null,
+        employee_id: form.employee_id || null
+      };
 
-    await API.post("/tasks/create", {
-      title: newTask,
-      description: "",
-      priority: "Medium",
-      due_date: null,
-      assigned_to: null
-    });
+      if (editingId) {
+        await API.put(`/development/${editingId}`, payload);
+      } else {
+        await API.post("/development/create", payload);
+      }
 
-    setNewTask("");
-    fetchTasks();
+      fetchTasks();
+      setEditingId(null);
+
+      setForm({
+        title: "",
+        description: "",
+        employee_id: "",
+        priority: "Medium",
+        status: "Pending",
+        dueDate: "",
+        allottedHours: ""
+      });
+
+    } catch (err) {
+      console.log(err);
+      alert("Failed to save task");
+    }
   };
 
   const handleEdit = (task) => {
     setEditingId(task.id);
-    setEditValue(task.title);
-  };
 
-  const handleSaveEdit = async (id) => {
-    await API.put(`/tasks/edit/${id}`, {
-      title: editValue
+    setForm({
+      title: task.title || "",
+      description: task.description || "",
+      employee_id: task.assigned_to || "",
+      priority: task.priority || "Medium",
+      status: task.status || "Pending",
+      dueDate: task.due_date ? task.due_date.split("T")[0] : "",
+      allottedHours: task.allotted_hours || ""
     });
-
-    setEditingId(null);
-    fetchTasks();
   };
+
+  const handleDelete = async (id) => {
+    try {
+      await API.delete(`/development/${id}`);
+      fetchTasks();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const filteredTasks = tasks.filter((task) =>
+    task.title?.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-bold mb-6">Task Development</h1>
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6">Task Development</h1>
 
-      {/* Add Task Block */}
-      <div className="bg-white p-6 rounded-xl shadow mb-8 flex gap-4">
-        <input
-          type="text"
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
-          placeholder="Enter new task name"
-          className="border p-3 rounded-lg flex-1"
-        />
-        <button
-          onClick={handleAddTask}
-          className="bg-purple-600 text-white px-6 py-2 rounded-lg"
-        >
-          Add Task
-        </button>
+      {/* Form */}
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow mb-6">
+        <div className="flex flex-col gap-4">
+
+          <input
+            type="text"
+            placeholder="Enter Task Title"
+            value={form.title}
+            onChange={(e) =>
+              setForm({ ...form, title: e.target.value })
+            }
+            className="border p-3 rounded-lg"
+          />
+
+          <textarea
+            placeholder="Enter Task Description"
+            value={form.description}
+            onChange={(e) =>
+              setForm({ ...form, description: e.target.value })
+            }
+            className="border p-3 rounded-lg"
+          />
+
+          <select
+            value={form.employee_id}
+            onChange={(e) =>
+              setForm({ ...form, employee_id: e.target.value })
+            }
+            className="border p-3 rounded-lg"
+          >
+            <option value="">Select Employee</option>
+            {employees.map((emp) => (
+              <option key={emp.id} value={emp.id}>
+                {emp.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={form.priority}
+            onChange={(e) =>
+              setForm({ ...form, priority: e.target.value })
+            }
+            className="border p-3 rounded-lg"
+          >
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
+          </select>
+
+          <select
+            value={form.status}
+            onChange={(e) =>
+              setForm({ ...form, status: e.target.value })
+            }
+            className="border p-3 rounded-lg"
+          >
+            <option>Pending</option>
+            <option>In-progress</option>
+            <option>Completed</option>
+          </select>
+
+          <input
+            type="date"
+            value={form.dueDate}
+            onChange={(e) =>
+              setForm({ ...form, dueDate: e.target.value })
+            }
+            className="border p-3 rounded-lg"
+          />
+
+          <input
+            type="number"
+            placeholder="Allotted Hours"
+            value={form.allottedHours}
+            onChange={(e) =>
+              setForm({ ...form, allottedHours: e.target.value })
+            }
+            className="border p-3 rounded-lg"
+          />
+
+          <button
+            onClick={handleSave}
+            className="bg-cyan-600 text-white px-6 py-2 rounded-lg"
+          >
+            {editingId ? "Update Task" : "Save Task"}
+          </button>
+
+        </div>
       </div>
 
       {/* Task List */}
-      <div className="bg-white p-6 rounded-xl shadow">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b">
-              <th className="py-3">Task Name</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+      {/* Task List */}
+<div className="bg-white p-4 sm:p-6 rounded-2xl shadow">
+  <input
+    type="text"
+    placeholder="Search tasks..."
+    className="border p-3 rounded-lg w-full sm:w-1/2 mb-6"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+  />
 
-          <tbody>
-            {tasks.map((task) => (
-              <tr key={task.id} className="border-b">
-                <td className="py-3">
-                  {editingId === task.id ? (
-                    <input
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      className="border p-2 rounded"
-                    />
-                  ) : (
-                    task.title
-                  )}
-                </td>
+  {/* ================= MOBILE VIEW (CARDS) ================= */}
+  <div className="sm:hidden space-y-4">
+    {filteredTasks.map((task) => (
+      <div
+        key={task.id}
+        className="border rounded-xl p-4 shadow-sm bg-gray-50"
+      >
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="font-semibold text-lg">
+            {task.title}
+          </h2>
 
-                <td>{task.status}</td>
+          <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
+            {task.priority}
+          </span>
+        </div>
 
-                <td>
-                  {editingId === task.id ? (
-                    <>
-                      <button
-                        onClick={() => handleSaveEdit(task.id)}
-                        className="bg-green-500 text-white px-3 py-1 rounded mr-2"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setEditingId(null)}
-                        className="bg-gray-400 text-white px-3 py-1 rounded"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => handleEdit(task)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded"
-                    >
-                      Edit
-                    </button>
+        <p className="text-sm text-gray-600 mb-2">
+          {task.description}
+        </p>
 
-                  )}
-                  <button onClick={()=> handleDelete(task.id)
-                  }
-                  className="bg-red-700 text-white px-3 py-1 rounded"> Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="text-sm space-y-1">
+          <p><strong>ID:</strong> TD{String(task.id).padStart(3, "0")}</p>
+          <p><strong>Employee:</strong> {task.employee_name || "Unassigned"}</p>
+          <p><strong>Status:</strong> {task.status}</p>
+          <p>
+            <strong>Due:</strong>{" "}
+            {task.due_date
+              ? new Date(task.due_date).toLocaleDateString()
+              : "-"}
+          </p>
+          <p>
+            <strong>Hours:</strong> {task.allotted_hours || "-"}
+          </p>
+        </div>
+
+        <div className="flex gap-4 mt-4">
+          <button
+            onClick={() => handleEdit(task)}
+            className="text-blue-600 font-medium"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => handleDelete(task.id)}
+            className="text-red-600 font-medium"
+          >
+            Delete
+          </button>
+        </div>
       </div>
+    ))}
+  </div>
+
+  {/* ================= DESKTOP TABLE ================= */}
+  <div className="hidden sm:block overflow-x-auto">
+    <table className="w-full text-left border-collapse">
+      <thead>
+        <tr className="border-b bg-gray-50 text-gray-600 text-sm uppercase">
+          <th className="py-3 px-2">ID</th>
+          <th className="px-2">Title</th>
+          <th className="px-2">Employee</th>
+          <th className="px-2">Priority</th>
+          <th className="px-2">Status</th>
+          <th className="px-2">Due</th>
+          <th className="px-2">Hours</th>
+          <th className="px-2">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {filteredTasks.map((task) => (
+          <tr
+            key={task.id}
+            className="border-b hover:bg-gray-50 transition"
+          >
+            <td className="py-3 px-2">
+              TD{String(task.id).padStart(3, "0")}
+            </td>
+            <td className="px-2 font-medium">
+              {task.title}
+            </td>
+            <td className="px-2">
+              {task.employee_name || "-"}
+            </td>
+            <td className="px-2">{task.priority}</td>
+            <td className="px-2">{task.status}</td>
+            <td className="px-2">
+              {task.due_date
+                ? new Date(task.due_date).toLocaleDateString()
+                : "-"}
+            </td>
+            <td className="px-2">
+              {task.allotted_hours || "-"}
+            </td>
+            <td className="px-2 flex gap-3">
+              <button
+                onClick={() => handleEdit(task)}
+                className="text-blue-600 hover:underline"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(task.id)}
+                className="text-red-600 hover:underline"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
     </AdminLayout>
   );
 }

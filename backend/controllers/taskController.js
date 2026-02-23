@@ -1,22 +1,42 @@
 const db = require("../config/db");
 
 const createTask = async (req, res) => {
+  console.log("BODY:", req.body);
   try {
-    const { title } = req.body;
+    const {
+      title,
+      description,
+      priority,
+      status,
+      due_date,
+      allotted_hours,
+      employee_id
+    } = req.body;
 
     if (!title || !title.trim()) {
       return res.status(400).json({ message: "Title is required" });
     }
 
     await db.execute(
-      "INSERT INTO tasks (title, created_by) VALUES (?, ?)",
-      [title, req.user?.id || null]
+      `INSERT INTO tasks 
+       (title, description, priority, status, due_date, allotted_hours, assigned_to, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?,?)`,
+      [
+        title,
+        description || null,
+        priority || "Medium",
+        status || "Pending",
+        due_date || null,
+        allotted_hours || null,
+        employee_id || null,
+        req.user?.id || null
+      ]
     );
 
     res.status(201).json({ message: "Task created successfully" });
 
   } catch (error) {
-    console.error(error);
+    console.error("CREATE TASK ERROR:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -32,9 +52,9 @@ const getAllTasks = async (req, res) => {
     t.status,
     t.due_date,
     t.allotted_hours,
-    u.name AS employee_name
+    e.name AS employee_name
   FROM tasks t
-  LEFT JOIN users u ON t.assigned_to = u.id
+  LEFT JOIN employees e ON t.assigned_to = e.id
   ORDER BY t.id DESC
 `);
 
@@ -51,7 +71,7 @@ const getMyTasks = async (req, res) => {
       "SELECT * FROM tasks WHERE assigned_to = ?",
       [req.user.id]
     );
-
+console.log("JWT USER:", req.user);
     res.json(tasks);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -61,22 +81,26 @@ const getMyTasks = async (req, res) => {
 const updateTask = async (req, res) => {
   try {
     const taskId = req.params.id;
-    const { priority, status, due_date, allotted_hours, employee_id } = req.body;
+    const { title, description, priority, status, due_date, allotted_hours, employee_id } = req.body;
 
     await db.execute(
       `UPDATE tasks 
-       SET priority = ?, 
+       SET title=?,
+          description=?,
+          priority = ?, 
            status = ?, 
            due_date = ?, 
            allotted_hours = ?,
            assigned_to = ?
        WHERE id = ?`,
       [
+        title,
+        description || null,
         priority || "Medium",
         status || "Pending",
         due_date || null,
         allotted_hours !== undefined ? allotted_hours : null,
-        employee_id !== undefined ? employee_id : null,
+        employee_id ? parseInt(employee_id) : null,
         taskId
       ]
     );
@@ -130,16 +154,26 @@ const addTaskUpdate = async (req, res) => {
 
 const getPendingTasks = async (req, res) => {
   try {
-    const [tasks] = await db.execute(
-      `SELECT tasks.*, users.name AS employee_name
-       FROM tasks
-       LEFT JOIN users ON tasks.assigned_to = users.id
-       WHERE tasks.assigned_to IS NULL`
-    );
+    const [tasks] = await db.execute(`
+      SELECT 
+        t.id,
+        t.title,
+        t.description,
+        t.priority,
+        t.status,
+        t.due_date,
+        t.allotted_hours,
+        t.assigned_to
+      FROM tasks t
+      WHERE t.assigned_to IS NULL
+      ORDER BY t.id DESC
+    `);
+    
 
     res.json(tasks);
 
   } catch (error) {
+    console.error("PENDING TASK ERROR:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -237,15 +271,16 @@ const getEntryTasks = async (req, res) => {
     const [tasks] = await db.execute(`
       SELECT t.id,
              t.title,
+             t.description,
              t.priority,
              t.status,
              t.due_date,
              t.allotted_hours,
              t.assigned_to,
-             u.name AS employee_name
+             e.name AS employee_name
       FROM tasks t
-      LEFT JOIN users u ON t.assigned_to = u.id
-      WHERE t.assigned_to IS NOT NULL
+      LEFT JOIN employees e ON t.assigned_to = e.id
+      ORDER BY t.id DESC
     `);
 
     res.json(tasks);

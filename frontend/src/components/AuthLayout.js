@@ -2,7 +2,7 @@ function AuthLayout({ title, children }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
 
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl">
+      <div className="w-full max-w-md bg-white p-4 sm:p-6 lg:p-8 rounded-2xl shadow-xl">
 
         <h1 className="text-4xl font-bold text-center mb-8">
           {title}

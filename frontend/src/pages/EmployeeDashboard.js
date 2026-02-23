@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../services/api";
 import EmployeeLayout from "../layouts/EmployeeLayout";
 
 function EmployeeDashboard() {
@@ -10,20 +10,19 @@ function EmployeeDashboard() {
   }, []);
 
   const fetchTasks = async () => {
-    const res = await axios.get("http://localhost:5000/api/tasks/my-tasks", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      }
-    });
-
+  try {
+    const res = await API.get("/tasks/my-tasks");
     setTasks(res.data);
-  };
+  } catch (err) {
+    console.error("FETCH TASK ERROR:", err);
+  }
+};
 
   const total = tasks.length;
-  const pending = tasks.filter(t => t.status === "pending").length;
-  const completed = tasks.filter(t => t.status === "completed").length;
+  const pending = tasks.filter(t => t.status === "Pending").length;
+  const completed = tasks.filter(t => t.status === "Completed").length;
   const overdue = tasks.filter(
-    t => new Date(t.deadline) < new Date() && t.status !== "completed"
+    t => new Date(t.due_date) < new Date() && t.status !== "Completed"
   ).length;
 
   return (
@@ -44,7 +43,7 @@ function Card({ title, value, color }) {
   return (
     <div className={`p-6 rounded-xl shadow-lg bg-${color}-500 text-white`}>
       <h2>{title}</h2>
-      <p className="text-3xl font-bold">{value}</p>
+      <p className="text-xl sm:text-2xl lg:text-3xl font-bold">{value}</p>
     </div>
   );
 }

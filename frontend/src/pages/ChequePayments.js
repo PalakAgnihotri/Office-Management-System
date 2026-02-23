@@ -60,7 +60,7 @@ function ChequePayments() {
 
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-bold mb-6">Cheque Payments</h1>
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6">Cheque Payments</h1>
 
       {/* FORM */}
       <div className="bg-white p-6 rounded-xl shadow mb-8">
@@ -129,48 +129,99 @@ function ChequePayments() {
       </div>
 
       {/* TABLE */}
-      <div className="bg-white p-6 rounded-xl shadow">
+      {/* PAYMENTS LIST */}
+<div className="bg-white p-4 sm:p-6 rounded-2xl shadow">
 
-        <div className="flex justify-between mb-6">
-          <input
-            type="text"
-            placeholder="Search payments..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border p-3 rounded-lg w-1/2"
-          />
+  <input
+    type="text"
+    placeholder="Search payments..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="border p-3 rounded-lg w-full sm:w-1/2 mb-6"
+  />
+
+  {/* ================= MOBILE VIEW (CARDS) ================= */}
+  <div className="sm:hidden space-y-4">
+    {filtered.map((c) => (
+      <div
+        key={c.id}
+        className="border rounded-xl p-4 shadow-sm bg-gray-50"
+      >
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="font-semibold text-lg">
+            ₹ {c.amount}
+          </h2>
+          <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
+            Cheque #{c.cheque_no}
+          </span>
         </div>
 
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b">
-              <th className="py-3">Cheque No</th>
-              <th>Payee</th>
-              <th>Amount</th>
-              <th>Date</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((c) => (
-              <tr key={c.id} className="border-b">
-                <td className="py-3">{c.cheque_no}</td>
-                <td>{c.payee}</td>
-                <td>₹ {c.amount}</td>
-                <td>
-                  {new Date(c.cheque_date).toLocaleDateString()}
-                </td>
-                <td
-                  className="text-red-500 cursor-pointer"
-                  onClick={() => handleDelete(c.id)}
-                >
-                  Delete
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="text-sm space-y-1">
+          <p><strong>Payee:</strong> {c.payee}</p>
+          <p><strong>Bank:</strong> {c.bank}</p>
+          <p>
+            <strong>Date:</strong>{" "}
+            {new Date(c.cheque_date).toLocaleDateString()}
+          </p>
+        </div>
+
+        <button
+          onClick={() => handleDelete(c.id)}
+          className="text-red-600 mt-4 font-medium"
+        >
+          Delete Payment
+        </button>
       </div>
+    ))}
+  </div>
+
+  {/* ================= DESKTOP TABLE ================= */}
+  <div className="hidden sm:block overflow-x-auto">
+    <table className="w-full text-left border-collapse">
+      <thead>
+        <tr className="border-b bg-gray-50 text-gray-600 text-sm uppercase">
+          <th className="py-3 px-2">Cheque No</th>
+          <th className="px-2">Payee</th>
+          <th className="px-2">Bank</th>
+          <th className="px-2">Amount</th>
+          <th className="px-2">Date</th>
+          <th className="px-2">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {filtered.map((c) => (
+          <tr
+            key={c.id}
+            className="border-b hover:bg-gray-50 transition"
+          >
+            <td className="py-3 px-2">
+              {c.cheque_no}
+            </td>
+            <td className="px-2">
+              {c.payee}
+            </td>
+            <td className="px-2">
+              {c.bank}
+            </td>
+            <td className="px-2 font-semibold">
+              ₹ {c.amount}
+            </td>
+            <td className="px-2">
+              {new Date(c.cheque_date).toLocaleDateString()}
+            </td>
+            <td
+              onClick={() => handleDelete(c.id)}
+              className="px-2 text-red-600 cursor-pointer hover:underline"
+            >
+              Delete
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
     </AdminLayout>
   );
 }

@@ -12,22 +12,26 @@ function Login() {
   });
 
   const handleLogin = async () => {
-    try {
-      const res = await API.post("/auth/login", form);
+  try {
+    const res = await API.post("/auth/login", form);
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.user.role);
+    console.log("LOGIN RESPONSE:", res.data);  // 👈 ADD THIS
 
-      if (res.data.user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/employee");
-      }
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("role", res.data.user.role);
 
-    } catch (err) {
-      alert("Invalid credentials");
+    console.log("STORED ROLE:", res.data.user.role); // 👈 ADD THIS
+
+    if (res.data.user.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/employee");
     }
-  };
+
+  } catch (err) {
+    alert("Invalid credentials");
+  }
+};
 
   return (
     <AuthLayout title="Login">
