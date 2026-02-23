@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://office-management-system-1-0fwc.onrender.com/"
+  baseURL: "https://office-management-system-1-0fwc.onrender.com/api"
 });
 
 API.interceptors.request.use((req) => {
