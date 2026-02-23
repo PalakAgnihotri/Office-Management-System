@@ -30,7 +30,7 @@ function AdminLayout({ children }) {
 
         {/* Sidebar */}
         <div className={`
-  fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-50
+  fixed inset-y-0 left-0 h-screen w-64 bg-white shadow-lg z-50
   transform transition-transform duration-300
   ${isOpen ? "translate-x-0" : "-translate-x-full"}
   md:relative md:translate-x-0 md:block
