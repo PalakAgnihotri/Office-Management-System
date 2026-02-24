@@ -116,10 +116,7 @@ function Sidebar({ role, onLogout, closeSidebar }) {
         <button
           onClick={onLogout}
           className=" bg-red-500 text-white py-2 px-6 rounded-lg">
-<<<<<<< HEAD
-        >
-=======
->>>>>>> 93a4e9b (changes don)
+
           Logout
         </button>
       </div>

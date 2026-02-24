@@ -14,15 +14,12 @@ function TaskDevelopment() {
   const [form, setForm] = useState({
     title: "",
     description: "",
+    status: "",
     // employee_id: "",
     // priority: "Medium",
-    status: " Select Status",
+    
     dueDate: getToday(),
-<<<<<<< HEAD
-    allottedHours: "",
-=======
     hours: "",
->>>>>>> 93a4e9b (changes don)
     minutes: ""
   });
 
@@ -59,11 +56,7 @@ function TaskDevelopment() {
         description: form.description,
         // priority: form.priority,
         status: form.status,
-<<<<<<< HEAD
-        due_date: form.dueDate || null,
-=======
         due_date: form.dueDate ? form.dueDate:null || null,
->>>>>>> 93a4e9b (changes don)
         allotted_hours: totalMinutes || null,
         minutes : form.minutes || null ,
         employee_id: form.employee_id || null
@@ -83,14 +76,9 @@ function TaskDevelopment() {
         description: "",
         // employee_id: "",
         // priority: "Medium",
-        status: "Select Status",
-<<<<<<< HEAD
-        dueDate: "",
-        allottedHours: "",
-=======
+        status: "",
         dueDate: getToday(),
         hours: "",
->>>>>>> 93a4e9b (changes don)
         minutes: ""
       });
 
@@ -102,19 +90,6 @@ function TaskDevelopment() {
 
   const handleEdit = (task) => {
 
-<<<<<<< HEAD
-    setForm({
-      title: task.title || "",
-      description: task.description || "",
-      // employee_id: task.assigned_to || "",
-      // priority: task.priority || "Medium",
-      status: task.status || "Select Status",
-      dueDate: task.due_date ? task.due_date.split("T")[0] : "",
-      allottedHours: task.allotted_hours || "",
-      minutes: task.minutes || ""
-    });
-  };
-=======
   setEditingId(task.id);
 
   const total = task.allotted_hours || 0;
@@ -139,7 +114,6 @@ function TaskDevelopment() {
   });
 
 };
->>>>>>> 93a4e9b (changes don)
 
   const handleDelete = async (id) => {
     try {
@@ -217,7 +191,9 @@ function TaskDevelopment() {
               setForm({ ...form, status: e.target.value })
             }
             className="border p-3 rounded-lg"
-          ><option value="">Select Status</option>
+          ><option value="" disabled hidden >
+    Select Status
+  </option>
             <option>Pending</option>
             <option>In-progress</option>
             <option>Completed</option>
@@ -235,11 +211,7 @@ function TaskDevelopment() {
           <input
     type="number"
     placeholder="Allotted Hours"
-<<<<<<< HEAD
-    value={form.allottedHours}
-=======
     value={form.hours}
->>>>>>> 93a4e9b (changes don)
     onChange={(e) =>
       setForm({ ...form,  hours: e.target.value })
     }
