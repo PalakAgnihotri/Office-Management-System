@@ -7,14 +7,17 @@ function TaskEntry() {
   const [search, setSearch] = useState("");
   const [employees, setEmployees] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const getToday = () => {
+  return new Date().toISOString().split("T")[0];
+};
 
   const [form, setForm] = useState({
     title: "",
     description:"",
     employee_id: "",
-    priority: "Medium",
-    status: "Pending",
-    dueDate: "",
+    priority: "Select Task Priority",
+    status: " Select Status",
+    dueDate: getToday(),
     hours:"",
     minutes:""
   });
@@ -65,8 +68,8 @@ function TaskEntry() {
       title: "",
       description: "",
       employee_id: "",
-      priority: "Medium",
-      status: "Pending",
+      priority: "Select Task Priority",
+      status: "Select Status",
       dueDate: "",
       hours: "",
       minutes: ""
@@ -79,16 +82,21 @@ function TaskEntry() {
 
   const handleEdit = (task) => {
     setEditingId(task.id);
+    const totalMinutes=task.allotted_hours || 0;
+    const hrs=Math.floor(totalMinutes/60);
+    const mins=totalMinutes%60;
 
     setForm({
       title: task.title || "",
       description: task.description ||"",
       employee_id: task.assigned_to || "",
-      priority: task.priority || "Medium",
-      status: task.status || "Pending",
+      priority: task.priority || "Select Task Priority",
+      status: task.status || "Select Status",
       dueDate: task.due_date ? task.due_date.split("T")[0] : "",
       dueTime: task.due_date ? task.due_date.split("T")[1]?.slice(0, 5) : "",
-      allottedHours: task.allotted_hours || ""
+      hours: hrs.toString(),
+      minutes:mins.toString()
+
     });
   };
 
@@ -141,6 +149,7 @@ function TaskEntry() {
             }
             className="border p-3 rounded-lg"
           >
+            <option value="">Select Task Priority</option>
             <option>Low</option>
             <option>Medium</option>
             <option>High</option>
@@ -153,6 +162,7 @@ function TaskEntry() {
             }
             className="border p-3 rounded-lg"
           >
+            <option value="">Select Status</option>
             <option>Pending</option>
             <option>In-progress</option>
             <option>Completed</option>
@@ -216,8 +226,6 @@ function TaskEntry() {
 
         </div>
       </div>
-
-      {/* Task List */}
       {/* Task List */}
 <div className="bg-white p-4 sm:p-6 rounded-2xl shadow">
   <input
