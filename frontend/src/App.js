@@ -21,6 +21,7 @@ import ChequeReport from "./pages/ChequeReport";
 import CourierInwardReport from "./pages/CourierInwardReport";
 import CourierOutwardReport from "./pages/CourierOutwardReport";
 import DevelopmentReport from "./pages/DevelopmentReport";
+import EmployeeTaskDevelopment from "./pages/EmployeeTaskDevelopment"
 
 function App() {
   return (
@@ -61,6 +62,16 @@ function App() {
   <Route path="/settings" element={<Settings />} />
   <Route path="/employees/profile" element={<EmployeeProfile />} />
   <Route path="/employees/report" element={<DevelopmentReport />} />
+
+  <Route
+  path="/employee/development"
+  element={
+    <ProtectedRoute role="employee">
+      <EmployeeTaskDevelopment />
+    </ProtectedRoute>
+  }
+/>
+
   <Route path="/admin/reports/cheques" element={<ChequeReport />} />
   <Route path="/admin/reports/courier-inward" element={<CourierInwardReport />} />
   <Route path="/admin/reports/courier-outward" element={<CourierOutwardReport />} />

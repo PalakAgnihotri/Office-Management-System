@@ -260,12 +260,11 @@ function TaskEntry() {
           <p><strong>ID:</strong> TE{String(task.id).padStart(3, "0")}</p>
           <p><strong>Employee:</strong> {task.employee_name || "Unassigned"}</p>
           <p><strong>Status:</strong> {task.status}</p>
-          <p>
-            <strong>Due:</strong>{" "}
-            {task.due_date
-              ? new Date(task.due_date).toLocaleDateString()
-              : "-"}
-          </p>
+          <p className="px-2">
+              {task.due_date
+  ? new Date(task.due_date).toLocaleDateString("en-IN")
+  : "-"}
+            </p>
           <p>
             <strong>Hours:</strong>{" "}
             {task.allotted_hours
@@ -329,8 +328,8 @@ function TaskEntry() {
             <td className="px-2">{task.status}</td>
             <td className="px-2">
               {task.due_date
-                ? new Date(task.due_date).toLocaleDateString()
-                : "-"}
+  ? new Date(task.due_date).toLocaleDateString("en-IN")
+  : "-"}
             </td>
             <td className="px-2">
               {task.allotted_hours

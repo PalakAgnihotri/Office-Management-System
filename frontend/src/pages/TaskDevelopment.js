@@ -59,7 +59,7 @@ function TaskDevelopment() {
         due_date: form.dueDate ? form.dueDate:null || null,
         allotted_hours: totalMinutes || null,
         minutes : form.minutes || null ,
-        employee_id: form.employee_id || null
+        // employee_id: form.employee_id || null
       };
 
       if (editingId) {
@@ -272,12 +272,11 @@ function TaskDevelopment() {
           <p><strong>ID:</strong> TD{String(task.id).padStart(3, "0")}</p>
           {/* <p><strong>Employee:</strong> {task.employee_name || "Unassigned"}</p> */}
           <p><strong>Status:</strong> {task.status}</p>
-          <p>
-            <strong>Date:</strong>{" "}
-            {task.due_date
+          <p className="px-2">
+              {task.due_date
   ? new Date(task.due_date).toLocaleDateString("en-IN")
   : "-"}
-          </p>
+            </p>
           <p>
             <strong>Hours:</strong> {task.allotted_hours
               ? `${Math.floor(task.allotted_hours / 60)}h ${

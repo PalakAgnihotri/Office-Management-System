@@ -13,6 +13,7 @@ const reportsRoutes = require("./routes/reportsRoutes");
 const chequeRoutes = require("./routes/chequeRoutes");
 const employeeRoutes=require("./routes/employeeRoutes");
 const developmentRoutes = require("./routes/developmentRoutes");
+const employeeDevelopmentRoutes = require("./routes/employeeDevelopmentRoutes");
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use("/api/reports", reportsRoutes);
 app.use("/api/cheques", chequeRoutes);
 app.use("/api/employees",employeeRoutes);
 app.use("/api/development", developmentRoutes);
+app.use("/api/employee-development",employeeDevelopmentRoutes);
 app.get("/", (req, res) => {
   res.send("API Running...");
 });
