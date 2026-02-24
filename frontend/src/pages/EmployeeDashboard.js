@@ -31,7 +31,7 @@ function EmployeeDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card title="Total Tasks" value={total} color="purple" />
-        <Card title="Pending" value={pending} color="pink" />
+        <Card title="Pending" value={pending} color="yellow" />
         <Card title="Completed" value={completed} color="green" />
         <Card title="Overdue" value={overdue} color="red" />
       </div>
