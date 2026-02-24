@@ -35,6 +35,26 @@ const createDevelopmentTask = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const deleteDevelopmentTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [result] = await db.execute(
+      "DELETE FROM development_tasks WHERE id = ?",
+      [id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.json({ message: "Development task deleted successfully" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 const getDevelopmentTasks = async (req, res) => {
   try {
@@ -53,5 +73,6 @@ const getDevelopmentTasks = async (req, res) => {
 
 module.exports = {
   createDevelopmentTask,
-  getDevelopmentTasks
+  getDevelopmentTasks,
+  deleteDevelopmentTask
 };
