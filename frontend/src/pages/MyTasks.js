@@ -7,7 +7,8 @@ function MyTasks() {
 
   const [editData, setEditData] = useState({
     status: "",
-    allotted_hours: ""
+    hours: "",
+    minutes:""
   });
 
   useEffect(() => {
@@ -30,48 +31,51 @@ const formatTime = (minutes) => {
 
   return `${hrs}h ${mins}m`;
 };
-const handleMarkComplete = async (taskId) => {
-  try {
-    await API.put(`/tasks/employee/${taskId}`,
-  { status: "Completed" },
-  {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    }
-  }
-);
+// const handleMarkComplete = async (taskId) => {
+//   try {
+//     await API.put(`/tasks/employee/${taskId}`,
+//   { status: "Completed" },
+//   {
+//     headers: {
+//       Authorization: `Bearer ${localStorage.getItem("token")}`
+//     }
+//   }
+// );
 
-    alert("Task marked as completed");
-    fetchTasks(); // refresh list
-  } catch (error) {
-    console.error(error);
-    alert("Failed to update task");
+//     alert("Task marked as completed");
+//     fetchTasks(); // refresh list
+//   } catch (error) {
+//     console.error(error);
+//     alert("Failed to update task");
+//   }
+// };
+  const handleUpdate = async (id) => {
+  try {
+
+    const totalMinutes =
+      (parseInt(editData.hours || 0) * 60) +
+      parseInt(editData.minutes || 0);
+
+    await API.put(
+      `/tasks/employee/${id}`,
+      {
+        status: editData.status,
+        allotted_hours: totalMinutes
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      }
+    );
+
+    setEditingId(null);
+    fetchTasks();
+
+  } catch (err) {
+    console.log(err);
   }
 };
-  const handleUpdate = async (id) => {
-    try {
-      await API.put(`/tasks/employee/${id}`,
-        {
-          status: editData.status,
-          allotted_hours:
-            editData.allotted_hours !== ""
-              ? editData.allotted_hours
-              : null
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
-          }
-        }
-      );
-
-      setEditingId(null);
-      fetchTasks();
-
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   return (
     <EmployeeLayout>
@@ -81,69 +85,146 @@ const handleMarkComplete = async (taskId) => {
 
   {/* ================= MOBILE VIEW (CARDS) ================= */}
   <div className="sm:hidden space-y-4">
-    {tasks.map((task) => (
+  {tasks.map((task) => {
+
+    const isEditing = editingId === task.id;
+
+    return (
       <div
         key={task.id}
         className="border rounded-xl p-4 shadow-sm bg-gray-50"
       >
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="font-semibold text-lg">
-            {task.title}
-          </h2>
-          <span
-            className={`text-xs px-2 py-1 rounded-full ${
-              task.status === "Completed"
-                ? "bg-green-100 text-green-600"
-                : task.status === "In-progress"
-                ? "bg-blue-100 text-blue-600"
-                : "bg-yellow-100 text-yellow-600"
-            }`}
-          >
-            {task.status}
-          </span>
-        </div>
 
-        <div className="text-sm space-y-1">
-          <p>
-            <strong>Deadline:</strong>{" "}
-            {task.due_date
-              ? new Date(task.due_date).toLocaleDateString()
-              : "N/A"}
-          </p>
+        {/* TITLE (READ ONLY) */}
+        <h2 className="font-semibold text-lg">
+          {task.title}
+        </h2>
 
-          <p>
-  
-  <strong>Time:</strong> {formatTime(task.allotted_hours)}
+        {/* DEADLINE (READ ONLY) */}
+        <p className="text-sm">
+          <strong>Deadline:</strong>{" "}
+          {task.due_date
+            ? new Date(task.due_date).toLocaleDateString()
+            : "N/A"}
+        </p>
 
-</p>
-        </div>
 
-        <div className="flex gap-2 mt-4">
-          {task.status !== "Completed" && (
-            <button
-              onClick={() => handleMarkComplete(task.id)}
-              className="bg-green-500 text-white px-3 py-1 rounded-lg text-sm"
+        {/* STATUS */}
+        <div className="mt-2">
+
+          <strong>Status:</strong>{" "}
+
+          {isEditing ? (
+            <select
+              value={editData.status}
+              onChange={(e) =>
+                setEditData({
+                  ...editData,
+                  status: e.target.value
+                })
+              }
+              className="border p-2 rounded mt-1 w-full"
             >
-              Complete
+              <option>Pending</option>
+              <option>In-progress</option>
+              <option>Completed</option>
+            </select>
+          ) : (
+            task.status
+          )}
+
+        </div>
+
+
+        {/* TIME */}
+        <div className="mt-2">
+
+          <strong>Alloted Time:</strong>{" "}
+
+          {isEditing ? (
+            <div className="flex gap-2 mt-1">
+
+              <input
+                type="number"
+                placeholder="Hours"
+                value={editData.hours}
+                onChange={(e) =>
+                  setEditData({
+                    ...editData,
+                    hours: e.target.value
+                  })
+                }
+                className="border p-2 rounded w-full"
+              />
+
+              <input
+                type="number"
+                placeholder="Minutes"
+                value={editData.minutes}
+                onChange={(e) =>
+                  setEditData({
+                    ...editData,
+                    minutes: e.target.value
+                  })
+                }
+                className="border p-2 rounded w-full"
+              />
+
+            </div>
+          ) : (
+            formatTime(task.allotted_hours)
+          )}
+
+        </div>
+
+
+        {/* BUTTONS */}
+        <div className="flex gap-2 mt-4">
+
+          {isEditing ? (
+            <>
+              <button
+                onClick={() => handleUpdate(task.id)}
+                className="bg-green-500 text-white px-4 py-2 rounded"
+              >
+                Save
+              </button>
+
+              <button
+                onClick={() => setEditingId(null)}
+                className="bg-gray-400 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => {
+
+                const total = task.allotted_hours || 0;
+
+                setEditingId(task.id);
+
+                setEditData({
+                  status: task.status,
+                  hours: Math.floor(total / 60),
+                  minutes: total % 60
+                });
+
+              }}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Edit
             </button>
           )}
 
-          <button
-            onClick={() => {
-              setEditingId(task.id);
-              setEditData({
-                status: task.status,
-                allotted_hours: task.allotted_hours || ""
-              });
-            }}
-            className="bg-blue-500 text-white px-3 py-1 rounded-lg text-sm"
-          >
-            Edit
-          </button>
         </div>
+
       </div>
-    ))}
-  </div>
+    );
+
+  })}
+</div>
 
   {/* ================= DESKTOP TABLE ================= */}
   <div className="hidden sm:block overflow-x-auto">
@@ -152,7 +233,7 @@ const handleMarkComplete = async (taskId) => {
         <tr className="border-b bg-gray-50 text-gray-600 text-sm uppercase">
           <th className="p-4">Task</th>
           <th className="p-4">Deadline</th>
-          <th className="p-4">Hours</th>
+          <th className="p-4">Alloted Time</th>
           <th className="p-4">Status</th>
           <th className="p-4 text-center">Action</th>
         </tr>
@@ -174,17 +255,33 @@ const handleMarkComplete = async (taskId) => {
 
             <td className="p-4">
               {editingId === task.id ? (
-                <input
-                  type="number"
-                  className="border p-1 rounded w-20"
-                  value={editData.allotted_hours}
-                  onChange={(e) =>
-                    setEditData({
-                      ...editData,
-                      allotted_hours: e.target.value
-                    })
-                  }
-                />
+                <div className="flex gap-2">
+  <input
+    type="number"
+    placeholder="H"
+    className="border p-1 rounded w-16"
+    value={editData.hours}
+    onChange={(e) =>
+      setEditData({
+        ...editData,
+        hours: e.target.value
+      })
+    }
+  />
+
+  <input
+    type="number"
+    placeholder="M"
+    className="border p-1 rounded w-16"
+    value={editData.minutes}
+    onChange={(e) =>
+      setEditData({
+        ...editData,
+        minutes: e.target.value
+      })
+    }
+  />
+</div>
               ) : (
                 formatTime(task.allotted_hours)
               )}
@@ -240,14 +337,14 @@ const handleMarkComplete = async (taskId) => {
                 </>
               ) : (
                 <>
-                  {task.status !== "Completed" && (
+                  {/* {task.status !== "Completed" && (
                     <button
                       onClick={() => handleMarkComplete(task.id)}
                       className="bg-green-500 text-white px-3 py-1 rounded"
                     >
                       Complete
                     </button>
-                  )}
+                  )} */}
 
                   <button
                     onClick={() => {

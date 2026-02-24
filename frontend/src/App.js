@@ -16,6 +16,12 @@ import EmployeeMaster from "./pages/EmployeeMaster";
 import Settings from "./pages/Settings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EmployeeProfile from "./pages/EmployeeProfile";
+import NotesReport from "./pages/NotesReport";
+import ChequeReport from "./pages/ChequeReport";
+import CourierInwardReport from "./pages/CourierInwardReport";
+import CourierOutwardReport from "./pages/CourierOutwardReport";
+import DevelopmentReport from "./pages/DevelopmentReport";
+
 function App() {
   return (
     <Router>
@@ -54,6 +60,11 @@ function App() {
   <Route path="/employee-master" element={<EmployeeMaster />} />
   <Route path="/settings" element={<Settings />} />
   <Route path="/employees/profile" element={<EmployeeProfile />} />
+  <Route path="/employees/report" element={<DevelopmentReport />} />
+  <Route path="/admin/reports/cheques" element={<ChequeReport />} />
+  <Route path="/admin/reports/courier-inward" element={<CourierInwardReport />} />
+  <Route path="/admin/reports/courier-outward" element={<CourierOutwardReport />} />
+  <Route path="/admin/reports/notes" element={<NotesReport />} />
 </Routes>
     </Router>
   );

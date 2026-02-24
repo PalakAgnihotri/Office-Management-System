@@ -15,12 +15,12 @@ function Login() {
   try {
     const res = await API.post("/auth/login", form);
 
-    console.log("LOGIN RESPONSE:", res.data);  // 👈 ADD THIS
+    console.log("LOGIN RESPONSE:", res.data);  
 
     localStorage.setItem("token", res.data.token);
     localStorage.setItem("role", res.data.user.role);
 
-    console.log("STORED ROLE:", res.data.user.role); // 👈 ADD THIS
+    console.log("STORED ROLE:", res.data.user.role); 
 
     if (res.data.user.role === "admin") {
       navigate("/admin");

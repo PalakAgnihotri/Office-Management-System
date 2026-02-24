@@ -60,7 +60,7 @@ function Notes() {
 
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-bold mb-6">Notes</h1>
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6">Notes</h1>
 
       {/* FORM */}
       <div className="bg-white p-6 rounded-xl shadow mb-8">

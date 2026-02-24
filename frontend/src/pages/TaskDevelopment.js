@@ -18,7 +18,11 @@ function TaskDevelopment() {
     // priority: "Medium",
     status: " Select Status",
     dueDate: getToday(),
+<<<<<<< HEAD
     allottedHours: "",
+=======
+    hours: "",
+>>>>>>> 93a4e9b (changes don)
     minutes: ""
   });
 
@@ -38,6 +42,14 @@ function TaskDevelopment() {
   };
 
   const handleSave = async () => {
+    if(!form.title.trim()){
+      alert("Task Title Required");
+      return;
+    }
+    if(!form.status){
+      alert("Status Required");
+      return;
+    }
     try {
       const totalMinutes =
       (parseInt(form.hours || 0) * 60) +
@@ -47,7 +59,11 @@ function TaskDevelopment() {
         description: form.description,
         // priority: form.priority,
         status: form.status,
+<<<<<<< HEAD
         due_date: form.dueDate || null,
+=======
+        due_date: form.dueDate ? form.dueDate:null || null,
+>>>>>>> 93a4e9b (changes don)
         allotted_hours: totalMinutes || null,
         minutes : form.minutes || null ,
         employee_id: form.employee_id || null
@@ -68,8 +84,13 @@ function TaskDevelopment() {
         // employee_id: "",
         // priority: "Medium",
         status: "Select Status",
+<<<<<<< HEAD
         dueDate: "",
         allottedHours: "",
+=======
+        dueDate: getToday(),
+        hours: "",
+>>>>>>> 93a4e9b (changes don)
         minutes: ""
       });
 
@@ -80,8 +101,8 @@ function TaskDevelopment() {
   };
 
   const handleEdit = (task) => {
-    setEditingId(task.id);
 
+<<<<<<< HEAD
     setForm({
       title: task.title || "",
       description: task.description || "",
@@ -93,6 +114,32 @@ function TaskDevelopment() {
       minutes: task.minutes || ""
     });
   };
+=======
+  setEditingId(task.id);
+
+  const total = task.allotted_hours || 0;
+  const hrs = Math.floor(total / 60);
+  const mins = total % 60;
+
+  let formattedDate = getToday();
+
+  if (task.due_date) {
+    const d = new Date(task.due_date);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    formattedDate = d.toISOString().split("T")[0];
+  }
+
+  setForm({
+    title: task.title || "",
+    description: task.description || "",
+    status: task.status || "",
+    dueDate: formattedDate,
+    hours: hrs,
+    minutes: mins
+  });
+
+};
+>>>>>>> 93a4e9b (changes don)
 
   const handleDelete = async (id) => {
     try {
@@ -188,7 +235,11 @@ function TaskDevelopment() {
           <input
     type="number"
     placeholder="Allotted Hours"
+<<<<<<< HEAD
     value={form.allottedHours}
+=======
+    value={form.hours}
+>>>>>>> 93a4e9b (changes don)
     onChange={(e) =>
       setForm({ ...form,  hours: e.target.value })
     }
@@ -252,8 +303,8 @@ function TaskDevelopment() {
           <p>
             <strong>Date:</strong>{" "}
             {task.due_date
-              ? new Date(task.due_date).toLocaleDateString()
-              : "-"}
+  ? new Date(task.due_date).toLocaleDateString("en-IN")
+  : "-"}
           </p>
           <p>
             <strong>Hours:</strong> {task.allotted_hours
@@ -319,8 +370,8 @@ function TaskDevelopment() {
             <td className="px-2">{task.status}</td>
             <td className="px-2">
               {task.due_date
-                ? new Date(task.due_date).toLocaleDateString()
-                : "-"}
+  ? new Date(task.due_date).toLocaleDateString("en-IN")
+  : "-"}
             </td>
             <td className="px-2">
               {task.allotted_hours

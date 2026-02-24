@@ -34,12 +34,20 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 // Serve frontend static files
+<<<<<<< HEAD
  app.use(express.static(path.join(__dirname, "../frontend/build")));
+=======
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+>>>>>>> 93a4e9b (changes don)
 
 // // Catch-all route (for React Router)
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
+<<<<<<< HEAD
  });
+=======
+});
+>>>>>>> 93a4e9b (changes don)
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
