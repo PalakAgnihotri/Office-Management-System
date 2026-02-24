@@ -70,9 +70,53 @@ const getDevelopmentTasks = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const updateDevelopmentTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    let {
+      title,
+      description,
+      priority,
+      status,
+      due_date,
+      allotted_hours,
+      employee_id
+    } = req.body;
+
+    await db.execute(
+      `UPDATE development_tasks
+       SET title = ?,
+           description = ?,
+           priority = ?,
+           status = ?,
+           due_date = ?,
+           allotted_hours = ?,
+           assigned_to = ?
+       WHERE id = ?`,
+      [
+        title ?? null,
+        description ?? null,
+        priority ?? null,
+        status ?? null,
+        due_date ?? null,
+        allotted_hours ?? null,
+        employee_id ?? null,
+        id
+      ]
+    );
+
+    res.json({ message: "Development task updated successfully" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 module.exports = {
   createDevelopmentTask,
   getDevelopmentTasks,
-  deleteDevelopmentTask
+  deleteDevelopmentTask,
+  updateDevelopmentTask
 };
