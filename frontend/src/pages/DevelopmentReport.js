@@ -80,10 +80,10 @@ function DevelopmentReport() {
 
               <div className="text-sm mt-2 space-y-1">
 
-                <p>
+                {/* <p>
                   <strong>Employee:</strong>{" "}
                   {task.employee_name || "Unassigned"}
-                </p>
+                </p> */}
 
                 <p>
                   <strong>Status:</strong>{" "}
@@ -128,8 +128,8 @@ function DevelopmentReport() {
 
                 <th className="p-4">ID</th>
                 <th className="p-4">Title</th>
-                <th className="p-4">Employee</th>
-                <th className="p-4">Priority</th>
+                {/* <th className="p-4">Employee</th>
+                <th className="p-4">Priority</th> */}
                 <th className="p-4">Status</th>
                 <th className="p-4">Hours</th>
                 <th className="p-4">Date</th>
@@ -156,13 +156,13 @@ function DevelopmentReport() {
                     {task.title}
                   </td>
 
-                  <td className="p-4">
+                  {/* <td className="p-4">
                     {task.employee_name || "-"}
-                  </td>
+                  </td> */}
 
-                  <td className="p-4">
+                  {/* <td className="p-4">
                     {task.priority}
-                  </td>
+                  </td> */}
 
                   <td className="p-4">
                     {task.status}
