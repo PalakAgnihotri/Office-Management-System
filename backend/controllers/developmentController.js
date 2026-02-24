@@ -114,32 +114,11 @@ const updateDevelopmentTask = async (req, res) => {
   }
 };
 
-const deleteDevelopmentTask = async (req, res) => {
-  try {
-    const { id } = req.params;
 
-    const [result] = await db.execute(
-      "DELETE FROM development_tasks WHERE id = ?",
-      [id]
-    );
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Task not found" });
-    }
-
-    res.json({ message: "Development task deleted successfully" });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
-  }
-};
->>>>>>> 93a4e9b (changes don)
 
 module.exports = {
   createDevelopmentTask,
   getDevelopmentTasks,
-
   deleteDevelopmentTask,
   updateDevelopmentTask
 };
