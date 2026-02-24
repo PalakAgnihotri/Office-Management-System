@@ -333,15 +333,19 @@ function TaskDevelopment() {
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
   const [editingId, setEditingId] = useState(null);
+  const getToday = () => {
+  return new Date().toISOString().split("T")[0];
+};
 
   const [form, setForm] = useState({
     title: "",
     description: "",
     // employee_id: "",
     // priority: "Medium",
-    status: "Pending",
-    dueDate: "",
-    allottedHours: ""
+    status: " Select Status",
+    dueDate: getToday(),
+    allottedHours: "",
+    minutes: ""
   });
 
   useEffect(() => {
@@ -361,13 +365,17 @@ function TaskDevelopment() {
 
   const handleSave = async () => {
     try {
+      const totalMinutes =
+      (parseInt(form.hours || 0) * 60) +
+      parseInt(form.minutes || 0);
       const payload = {
         title: form.title,
         description: form.description,
         // priority: form.priority,
         status: form.status,
         due_date: form.dueDate || null,
-        allotted_hours: form.allottedHours || null,
+        allotted_hours: totalMinutes || null,
+        minutes : form.minutes || null ,
         employee_id: form.employee_id || null
       };
 
@@ -387,7 +395,8 @@ function TaskDevelopment() {
         // priority: "Medium",
         status: "Pending",
         dueDate: "",
-        allottedHours: ""
+        allottedHours: "",
+        minutes: ""
       });
 
     } catch (err) {
@@ -406,7 +415,8 @@ function TaskDevelopment() {
       // priority: task.priority || "Medium",
       status: task.status || "Pending",
       dueDate: task.due_date ? task.due_date.split("T")[0] : "",
-      allottedHours: task.allotted_hours || ""
+      allottedHours: task.allotted_hours || "",
+      minutes: task.minutes || ""
     });
   };
 
@@ -422,6 +432,8 @@ function TaskDevelopment() {
   const filteredTasks = tasks.filter((task) =>
     task.title?.toLowerCase().includes(search.toLowerCase())
   );
+  
+  
 
   return (
     <AdminLayout>
@@ -478,12 +490,13 @@ function TaskDevelopment() {
           </select> */}
 
           <select
+          
             value={form.status}
             onChange={(e) =>
               setForm({ ...form, status: e.target.value })
             }
             className="border p-3 rounded-lg"
-          >
+          ><option value="">Select Status</option>
             <option>Pending</option>
             <option>In-progress</option>
             <option>Completed</option>
@@ -499,14 +512,24 @@ function TaskDevelopment() {
           />
 
           <input
-            type="number"
-            placeholder="Allotted Hours"
-            value={form.allottedHours}
-            onChange={(e) =>
-              setForm({ ...form, allottedHours: e.target.value })
-            }
-            className="border p-3 rounded-lg"
-          />
+    type="number"
+    placeholder="Hours"
+    value={form.allottedHours}
+    onChange={(e) =>
+      setForm({ ...form, hours: e.target.value })
+    }
+    className="border p-3 rounded-lg w-full"
+  />
+  <input
+    type="number"
+    placeholder="Minutes"
+    value={form.minutes}
+    onChange={(e) =>
+      setForm({ ...form, minutes: e.target.value })
+    }
+    className="border p-3 rounded-lg w-full"
+  />
+
 
           <button
             onClick={handleSave}
@@ -553,13 +576,17 @@ function TaskDevelopment() {
           {/* <p><strong>Employee:</strong> {task.employee_name || "Unassigned"}</p> */}
           <p><strong>Status:</strong> {task.status}</p>
           <p>
-            <strong>Due:</strong>{" "}
+            <strong>Date:</strong>{" "}
             {task.due_date
               ? new Date(task.due_date).toLocaleDateString()
               : "-"}
           </p>
           <p>
-            <strong>Hours:</strong> {task.allotted_hours || "-"}
+            <strong>Hours:</strong> {task.allotted_hours
+              ? `${Math.floor(task.allotted_hours / 60)}h ${
+                  task.allotted_hours % 60
+                }m`
+              : "-"}
           </p>
         </div>
 
@@ -592,7 +619,7 @@ function TaskDevelopment() {
           {/* <th className="px-2">Employee</th>
           <th className="px-2">Priority</th> */}
           <th className="px-2">Status</th>
-          <th className="px-2">Due</th>
+          <th className="px-2">Date</th>
           <th className="px-2">Hours</th>
           <th className="px-2">Action</th>
         </tr>
@@ -622,7 +649,11 @@ function TaskDevelopment() {
                 : "-"}
             </td>
             <td className="px-2">
-              {task.allotted_hours || "-"}
+              {task.allotted_hours
+                ? `${Math.floor(task.allotted_hours / 60)}h ${
+                    task.allotted_hours % 60
+                  }m`
+                : "-"}
             </td>
             <td className="px-2 flex gap-3">
               <button
