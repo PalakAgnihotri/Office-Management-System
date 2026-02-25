@@ -160,9 +160,9 @@ function CourierOutward() {
 
         <button
           onClick={() => handleDelete(item.id)}
-          className="text-red-600 mt-4 font-medium"
+          className="bg-red-500 text-white px-3 py-1 rounded"
         >
-          Delete Entry
+          Delete
         </button>
       </div>
     ))}
