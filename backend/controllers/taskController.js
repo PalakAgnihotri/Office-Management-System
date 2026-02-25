@@ -10,7 +10,8 @@ const createTask = async (req, res) => {
       status,
       due_date,
       allotted_hours,
-      employee_id
+      employee_id,
+      remarks
     } = req.body;
 
     if (!title || !title.trim()) {
@@ -19,8 +20,8 @@ const createTask = async (req, res) => {
 
     await db.execute(
       `INSERT INTO tasks 
-       (title, description, priority, status, due_date, allotted_hours, assigned_to, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?,?)`,
+       (title, description, priority, status, due_date, allotted_hours, assigned_to, created_by,remarks)
+       VALUES (?, ?, ?, ?, ?, ?, ?,?,?)`,
       [
         title,
         description || null,
@@ -29,7 +30,9 @@ const createTask = async (req, res) => {
         due_date || null,
         allotted_hours || null,
         employee_id || null,
-        req.user?.id || null
+        
+        req.user?.id || null,
+        remarks || null,
       ]
     );
 
@@ -51,6 +54,7 @@ const getAllTasks = async (req, res) => {
     t.priority,
     t.status,
     t.due_date,
+    t.remarks,
     t.allotted_hours,
     e.name AS employee_name
   FROM tasks t
@@ -81,7 +85,7 @@ console.log("JWT USER:", req.user);
 const updateTask = async (req, res) => {
   try {
     const taskId = req.params.id;
-    const { title, description, priority, status, due_date, allotted_hours, employee_id } = req.body;
+    const { title, description, priority, status, due_date, allotted_hours, employee_id, remarks } = req.body;
 
     await db.execute(
       `UPDATE tasks 
@@ -91,16 +95,19 @@ const updateTask = async (req, res) => {
            status = ?, 
            due_date = ?, 
            allotted_hours = ?,
-           assigned_to = ?
-       WHERE id = ?`,
+           assigned_to = ?,
+           remarks =? 
+           WHERE id = ?`,
       [
         title,
         description || null,
         priority || "Medium",
         status || "Pending",
         due_date || null,
+        
         allotted_hours !== undefined ? allotted_hours : null,
         employee_id ? parseInt(employee_id) : null,
+        remarks || null,
         taskId
       ]
     );
@@ -163,6 +170,7 @@ const getPendingTasks = async (req, res) => {
         t.status,
         t.due_date,
         t.allotted_hours,
+        t.remarks,
         t.assigned_to
       FROM tasks t
       WHERE t.assigned_to IS NULL
@@ -198,15 +206,15 @@ const deleteTask = async (req, res) => {
 const updateTaskByEmployee = async (req, res) => {
   try {
     const taskId = req.params.id;
-    const { status, allotted_hours } = req.body;
+    const { status, allotted_hours , remarks} = req.body;
 
     await db.execute(
       `UPDATE tasks 
-       SET status = ?, allotted_hours = ?
+       SET status = ?, allotted_hours = ? , remarks =?
        WHERE id = ? AND assigned_to = ?`,
       [
         status || "Pending",
-        allotted_hours !== undefined ? allotted_hours : null,
+        allotted_hours !== undefined ? allotted_hours : null, remarks || null,
         taskId,
         req.user.id
       ]
@@ -277,6 +285,7 @@ const getEntryTasks = async (req, res) => {
              t.due_date,
              t.allotted_hours,
              t.assigned_to,
+             t.remarks,
              e.name AS employee_name
       FROM tasks t
       LEFT JOIN employees e ON t.assigned_to = e.id
