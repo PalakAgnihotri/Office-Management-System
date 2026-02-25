@@ -190,7 +190,7 @@ function EmployeeMaster() {
 
         <button
           onClick={() => handleDelete(emp.id)}
-          className="text-red-600 mt-4 font-medium"
+          className="bg-red-500 text-white px-3 py-1 rounded"
         >
           Delete Employee
         </button>
@@ -227,7 +227,7 @@ function EmployeeMaster() {
             <td className="px-2">{emp.designation || "-"}</td>
             <td
               onClick={() => handleDelete(emp.id)}
-              className="px-2 text-red-600 cursor-pointer hover:underline"
+              className="bg-red-500 text-white px-3 py-1 rounded"
             >
               Delete
             </td>
