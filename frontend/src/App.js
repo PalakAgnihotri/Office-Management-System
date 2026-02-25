@@ -20,8 +20,10 @@ import NotesReport from "./pages/NotesReport";
 import ChequeReport from "./pages/ChequeReport";
 import CourierInwardReport from "./pages/CourierInwardReport";
 import CourierOutwardReport from "./pages/CourierOutwardReport";
+import TaskDevelopmentReport from "./pages/TaskDevelopmentReport"
 import DevelopmentReport from "./pages/DevelopmentReport";
 import EmployeeTaskDevelopment from "./pages/EmployeeTaskDevelopment"
+
 
 function App() {
   return (
@@ -75,6 +77,7 @@ function App() {
   <Route path="/admin/reports/cheques" element={<ChequeReport />} />
   <Route path="/admin/reports/courier-inward" element={<CourierInwardReport />} />
   <Route path="/admin/reports/courier-outward" element={<CourierOutwardReport />} />
+  <Route path="/admin/reports/task-development-report" element={<TaskDevelopmentReport />} />
   <Route path="/admin/reports/notes" element={<NotesReport />} />
 </Routes>
     </Router>

@@ -56,10 +56,10 @@ function AdminDashboard() {
     <h2 className="text-3xl font-bold mt-2">{data.overdueTasks ?? 0}</h2>
   </div>
   {/* Graph Section */}
-<div className="bg-white p-4 sm:p-6 lg:p-4 sm:p-6 lg:p-8 rounded-2xl shadow-xl mt-8 w-full">
+<div className="bg-white p-6 lg:p-8 rounded-2xl shadow-xl mt-8 w-full col-span-full">
   <h2 className="text-2xl font-bold mb-8">Task Statistics</h2>
 
-  <div className="w-full h-[400px]">
+  <div className="w-full h-[500px]">
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={chartData} barCategoryGap="30%">
         <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
@@ -70,7 +70,7 @@ function AdminDashboard() {
           dataKey="value"
           fill="#7c3aed"
           radius={[8, 8, 0, 0]}
-          barSize={60}
+          barSize={80}
         />
       </BarChart>
     </ResponsiveContainer>

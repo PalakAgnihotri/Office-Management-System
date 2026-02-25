@@ -167,9 +167,9 @@ function ChequePayments() {
 
         <button
           onClick={() => handleDelete(c.id)}
-          className="text-red-600 mt-4 font-medium"
+          className="bg-red-600 text-white px-3 py-1 rounded"
         >
-          Delete Payment
+          Delete
         </button>
       </div>
     ))}
@@ -210,12 +210,14 @@ function ChequePayments() {
             <td className="px-2">
               {new Date(c.cheque_date).toLocaleDateString()}
             </td>
-            <td
-              onClick={() => handleDelete(c.id)}
-              className="px-2 text-red-600 cursor-pointer hover:underline"
-            >
-              Delete
-            </td>
+            <td className="p-4 align-middle">
+  <button
+    onClick={() => handleDelete(c.id)}
+    className="bg-red-600 text-white px-3 py-1 text-sm rounded-md hover:bg-red-700"
+  >
+    Delete
+  </button>
+</td>
           </tr>
         ))}
       </tbody>

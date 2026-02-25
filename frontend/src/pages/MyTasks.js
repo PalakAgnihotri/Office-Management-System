@@ -400,6 +400,7 @@ task.remarks || "—"
                       Complete
                     </button>
                   )} */}
+                  <td className="align-middle">
 
                   <button
                     onClick={() => {
@@ -415,6 +416,7 @@ task.remarks || "—"
                   >
                     Edit
                   </button>
+                  </td>
                 </>
               )}
             </td>

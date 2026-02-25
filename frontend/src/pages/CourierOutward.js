@@ -197,13 +197,15 @@ function CourierOutward() {
             <td className="px-2">
               {new Date(item.created_at).toLocaleDateString()}
             </td>
+            <td className="align-middle">
             <td>
               <button
                 onClick={() => handleDelete(item.id)}
-                className="text-red-600 hover:underline"
+                className="bg-red-600 text-white px-3 py-1 rounded"
               >
                 Delete
               </button>
+            </td>
             </td>
           </tr>
         ))}
