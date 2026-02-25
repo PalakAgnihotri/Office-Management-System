@@ -275,7 +275,8 @@ function TaskDevelopment() {
           <p><strong>ID:</strong> TD{String(task.id).padStart(3, "0")}</p>
           {/* <p><strong>Employee:</strong> {task.employee_name || "Unassigned"}</p> */}
           <p><strong>Status:</strong> {task.status}</p>
-          <p className="px-2">
+          <p>
+          <strong>Date:</strong>
               {task.due_date
   ? new Date(task.due_date).toLocaleDateString("en-IN")
   : "-"}
