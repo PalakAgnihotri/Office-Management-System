@@ -8,7 +8,8 @@ function MyTasks() {
   const [editData, setEditData] = useState({
     status: "",
     hours: "",
-    minutes:""
+    minutes:"",
+    remarks:"",
   });
 
   useEffect(() => {
@@ -60,7 +61,8 @@ const formatTime = (minutes) => {
       `/tasks/employee/${id}`,
       {
         status: editData.status,
-        allotted_hours: totalMinutes
+        allotted_hours: totalMinutes,
+        remarks: editData.remarks
       },
       {
         headers: {
@@ -174,8 +176,37 @@ const formatTime = (minutes) => {
           ) : (
             formatTime(task.allotted_hours)
           )}
+          {/* REMARKS */}
+<div className="mt-2">
+
+<strong>Remarks:</strong>
+
+{isEditing ? (
+
+<textarea
+  placeholder="Enter remarks (optional)"
+  value={editData.remarks || ""}
+  onChange={(e)=>
+    setEditData({
+      ...editData,
+      remarks:e.target.value
+    })
+  }
+  className="border p-2 rounded w-full mt-1"
+/>
+
+) : (
+
+task.remarks || "—"
+
+)}
+
+</div>
+
+          
 
         </div>
+        
 
 
         {/* BUTTONS */}
@@ -208,7 +239,8 @@ const formatTime = (minutes) => {
                 setEditData({
                   status: task.status,
                   hours: Math.floor(total / 60),
-                  minutes: total % 60
+                  minutes: total % 60,
+                  remarks: task.remarks || ""
                 });
 
               }}
@@ -235,6 +267,7 @@ const formatTime = (minutes) => {
           <th className="p-4">Deadline</th>
           <th className="p-4">Alloted Time</th>
           <th className="p-4">Status</th>
+          <th className="p-4">Remarks</th>
           <th className="p-4 text-center">Action</th>
         </tr>
       </thead>
@@ -317,6 +350,28 @@ const formatTime = (minutes) => {
                 </span>
               )}
             </td>
+            <td className="p-4">
+
+{editingId === task.id ? (
+
+<textarea
+  value={editData.remarks || ""}
+  onChange={(e)=>
+    setEditData({
+      ...editData,
+      remarks:e.target.value
+    })
+  }
+  className="border p-1 rounded w-full"
+/>
+
+) : (
+
+task.remarks || "—"
+
+)}
+
+</td>
 
             <td className="p-4 text-center space-x-2">
               {editingId === task.id ? (
@@ -352,7 +407,8 @@ const formatTime = (minutes) => {
                       setEditData({
                         status: task.status,
                         allotted_hours:
-                          task.allotted_hours || ""
+                        task.allotted_hours || "",
+                        remarks: task.remarks || ""
                       });
                     }}
                     className="bg-blue-500 text-white px-3 py-1 rounded"
