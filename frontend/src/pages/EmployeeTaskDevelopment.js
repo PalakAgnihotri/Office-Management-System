@@ -120,7 +120,7 @@ fetchTasks();
 // };
 const handleEdit = (task) => {
 
-  setEditingId(task.editingId);
+  setEditingId(task.id);
 
   const total = task.allotted_hours || 0;
   const hrs = Math.floor(total / 60);
