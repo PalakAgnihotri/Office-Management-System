@@ -19,7 +19,8 @@ function TaskEntry() {
     status: " Select Status",
     dueDate: getToday(),
     hours:"",
-    minutes:""
+    minutes:"",
+    remarks:""
   });
 
   useEffect(() => {
@@ -52,7 +53,8 @@ function TaskEntry() {
       status: form.status,
       due_date: form.dueDate || null,
       allotted_hours: totalMinutes || null,
-      employee_id: form.employee_id || null
+      employee_id: form.employee_id || null,
+      remarks: form.remarks || null
     };
 
     if (editingId) {
@@ -72,7 +74,8 @@ function TaskEntry() {
       status: "Select Status",
       dueDate: "",
       hours: "",
-      minutes: ""
+      minutes: "",
+      remarks:""
     });
 
   } catch (err) {
@@ -95,7 +98,8 @@ function TaskEntry() {
       dueDate: task.due_date ? task.due_date.split("T")[0] : "",
       dueTime: task.due_date ? task.due_date.split("T")[1]?.slice(0, 5) : "",
       hours: hrs.toString(),
-      minutes:mins.toString()
+      minutes:mins.toString(),
+      remarks: task.remarks || "",
 
     });
   };
@@ -216,6 +220,17 @@ function TaskEntry() {
               </option>
             ))}
           </select>
+          <div>
+            <textarea
+  placeholder="Remarks"
+  value={form.remarks}
+  onChange={(e) =>
+    setForm({ ...form, remarks: e.target.value })
+  }
+  className="border p-3 rounded-lg"
+  rows={4}
+/>
+          </div>
 
           <button
             onClick={handleSave}
@@ -260,7 +275,8 @@ function TaskEntry() {
           <p><strong>ID:</strong> TE{String(task.id).padStart(3, "0")}</p>
           <p><strong>Employee:</strong> {task.employee_name || "Unassigned"}</p>
           <p><strong>Status:</strong> {task.status}</p>
-          <p className="px-2">
+          <p>
+            <strong>Due:</strong>
               {task.due_date
   ? new Date(task.due_date).toLocaleDateString("en-IN")
   : "-"}
@@ -274,6 +290,10 @@ function TaskEntry() {
               : "-"}
           </p>
         </div>
+        <p>
+          <strong>Remarks:</strong>
+          {task.remarks}
+        </p>
 
         <div className="flex gap-4 mt-4">
           <button
@@ -304,7 +324,9 @@ function TaskEntry() {
           <th className="px-2">Priority</th>
           <th className="px-2">Status</th>
           <th className="px-2">Due</th>
+          
           <th className="px-2">Hours</th>
+          <th className ="px-2">Remarks</th>
           <th className="px-2">Action</th>
         </tr>
       </thead>
@@ -338,6 +360,10 @@ function TaskEntry() {
                   }m`
                 : "-"}
             </td>
+            <td className="px-2 font-medium">
+              {task.remarks}
+            </td>
+
             <td className="px-2 flex gap-3">
               <button
                 onClick={() => handleEdit(task)}
