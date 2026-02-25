@@ -29,12 +29,7 @@ function Notes() {
     }
 
     try {
-      await API.post("/notes", {
-        title,
-        category,
-        content
-      });
-
+      await API.post("/notes", { title, category, content });
       alert("Note saved successfully");
       setTitle("");
       setCategory("");
@@ -60,10 +55,12 @@ function Notes() {
 
   return (
     <AdminLayout>
-      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6">Notes</h1>
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6">
+        Notes
+      </h1>
 
       {/* FORM */}
-      <div className="bg-white p-6 rounded-xl shadow mb-8">
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow mb-6 sm:mb-8">
         <label className="block font-medium mb-2">Title</label>
         <input
           type="text"
@@ -87,13 +84,14 @@ function Notes() {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Write your note..."
-          className="w-full border p-4 rounded-lg mb-6 h-28"
+          className="w-full border p-3 rounded-lg mb-4 h-28"
         />
 
-        <div className="flex gap-4">
+        {/* Buttons responsive */}
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={handleSave}
-            className="bg-teal-600 text-white px-6 py-2 rounded-lg"
+            className="bg-teal-600 text-white px-6 py-2 rounded-lg w-full sm:w-auto"
           >
             Save Note
           </button>
@@ -104,55 +102,92 @@ function Notes() {
               setCategory("");
               setContent("");
             }}
-            className="border px-6 py-2 rounded-lg"
+            className="border px-6 py-2 rounded-lg w-full sm:w-auto"
           >
             Clear
           </button>
         </div>
       </div>
 
-      {/* TABLE */}
-      <div className="bg-white p-6 rounded-xl shadow">
-        <div className="flex justify-between mb-6">
-          <input
-            type="text"
-            placeholder="Search notes..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border p-3 rounded-lg w-1/2"
-          />
+      {/* NOTES LIST */}
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
+
+        {/* Search */}
+        <input
+          type="text"
+          placeholder="Search notes..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border p-3 rounded-lg w-full sm:w-1/2 mb-6"
+        />
+
+        {/* MOBILE VIEW (cards) */}
+        <div className="sm:hidden space-y-4">
+          {filtered.map((note) => (
+            <div
+              key={note.id}
+              className="border rounded-xl p-4 shadow-sm bg-gray-50"
+            >
+              <h2 className="font-semibold text-lg">
+                {note.title}
+              </h2>
+
+              <p className="text-sm text-gray-600">
+                Category: {note.category}
+              </p>
+
+              <p className="text-sm text-gray-600">
+                Date:{" "}
+                {new Date(note.created_at).toLocaleDateString()}
+              </p>
+
+              <button
+                onClick={() => handleDelete(note.id)}
+                className="bg-red-600 text-white px-3 py-1 rounded"
+              >
+                Delete
+              </button>
+            </div>
+          ))}
         </div>
 
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b">
-              <th className="py-3">Title</th>
-              <th>Category</th>
-              <th>Date</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((note) => (
-              <tr key={note.id} className="border-b">
-                <td className="py-3">{note.title}</td>
-                <td>{note.category}</td>
-                <td>
-                  {new Date(note.created_at).toLocaleDateString()}
-                </td>
-                <td>
-                  <button
-                    onClick={() => handleDelete(note.id)}
-                    className="text-red-500"
-                  >
-                    Delete
-                  </button>
-                </td>
+        {/* DESKTOP TABLE */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b">
+                <th className="py-3">Title</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {filtered.map((note) => (
+                <tr key={note.id} className="border-b hover:bg-gray-50">
+                  <td className="py-3">{note.title}</td>
+                  <td>{note.category}</td>
+                  <td>
+                    {new Date(note.created_at).toLocaleDateString()}
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => handleDelete(note.id)}
+                      className="bg-red-600 text-white px-3 py-1 rounded"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+
+          </table>
+        </div>
+
       </div>
+
     </AdminLayout>
   );
 }

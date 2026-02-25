@@ -145,9 +145,9 @@ function CourierInward() {
 
         <button
           onClick={() => handleDelete(item.id)}
-          className="text-red-600 mt-4 font-medium"
+          className="bg-red-600 text-white px-4 py-2 rounded"
         >
-          Delete Entry
+          Delete 
         </button>
       </div>
     ))}
@@ -182,13 +182,16 @@ function CourierInward() {
             <td className="px-2">
               {new Date(item.created_at).toLocaleDateString()}
             </td>
+            <td className="align-middle">
             <td>
+
               <button
                 onClick={() => handleDelete(item.id)}
-                className="text-red-600 hover:underline"
+                className="bg-red-600 text-white px-4 py-2 rounded"
               >
                 Delete
               </button>
+            </td>
             </td>
           </tr>
         ))}

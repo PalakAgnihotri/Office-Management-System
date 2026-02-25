@@ -138,6 +138,14 @@ function Sidebar({ role, onLogout, closeSidebar }) {
                   >
                     Notes Report
                   </NavLink>
+                  <NavLink
+                    to="/admin/reports/task-development-report"
+                    className="px-2 py-1 rounded hover:bg-purple-50"
+                    onClick={closeSidebar}
+                  >
+                    Task Development Report
+                  </NavLink>
+
                 </div>
               )}
             </div>
