@@ -3,50 +3,87 @@ import API from "../services/api";
 import EmployeeLayout from "../layouts/EmployeeLayout";
 
 function DevelopmentReport() {
+  const getToday = () => {
+  return new Date().toISOString().split("T")[0];
+};
 
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState("");
-  
-  const [fromDate, setFromDate] = useState("");
-const [toDate, setToDate] = useState("");
+  const [myTasks, setMyTasks] = useState([]);
+  const [fromDate, setFromDate] = useState(getToday());
+  const [toDate, setToDate] = useState(getToday());
 
 
 
   useEffect(() => {
     fetchTasks();
+    fetchMyTasks();
   }, []);
 
 
-  const fetchTasks = async () => {
-    try {
+ const fetchTasks = async () => {
+  try {
+    const res = await API.get("/employee-development/my");
 
-      const res = await API.get("/development/all");
+    console.log("API RESPONSE:", res.data);
 
+    if (Array.isArray(res.data)) {
       setTasks(res.data);
-
-    } catch (err) {
-
-      console.log(err);
-
+    } else if (Array.isArray(res.data.tasks)) {
+      setTasks(res.data.tasks);
+    } else {
+      setTasks([]); // fallback safety
     }
-  };
 
+  } catch (err) {
+    console.log(err);
+    setTasks([]);
+  }
+};
+const fetchMyTasks = async () => {
+  try {
+    const res = await API.get("/tasks/my-tasks");
+    setMyTasks(Array.isArray(res.data) ? res.data : []);
+  } catch {
+    setMyTasks([]);
+  }
+};
 
-  const filtered = tasks.filter((task) => {
-  const matchesTitle = task.title
-    ?.toLowerCase()
-    .includes(search.toLowerCase());
+  const filtered = Array.isArray(tasks)
+  ? tasks.filter((task) =>
+      task.title?.toLowerCase().includes(search.toLowerCase())
+    )
+  : [];
+const filteredMyTasks =
+  fromDate && toDate
+    ? myTasks.filter((task) => {
 
-  const taskDate = task.created_at
-    ? new Date(task.created_at).toISOString().split("T")[0]
-    : null;
+        if (!task.work_date) return false;
 
-  const matchesFrom = fromDate ? taskDate >= fromDate : true;
-  const matchesTo = toDate ? taskDate <= toDate : true;
+        const matchesTitle =
+          task.title?.toLowerCase().includes(search.toLowerCase());
 
-  return matchesTitle && matchesFrom && matchesTo;
-});
+        const taskDate =
+          new Date(task.work_date).toISOString().split("T")[0];
 
+        return (
+          matchesTitle &&
+          taskDate >= fromDate &&
+          taskDate <= toDate
+        );
+      })
+    : [];
+const combinedTasks = [
+  ...filtered.map(task => ({
+    ...task,
+    displayDate: task.due_date
+  })),
+
+  ...filteredMyTasks.map(task => ({
+    ...task,
+    displayDate: task.work_date
+  }))
+];
 
   return (
     <EmployeeLayout>
@@ -108,12 +145,13 @@ const [toDate, setToDate] = useState("");
     <button
       onClick={() => {
         setSearch("");
-        setFromDate("");
-        setToDate("");
+        const today = getToday();
+setFromDate(today);
+setToDate(today);
       }}
       className="px-4 py-2 text-sm rounded-lg bg-gray-200 hover:bg-gray-300 transition whitespace-nowrap"
     >
-      Clear
+      Refresh
     </button>
   </div>
 </div>
@@ -127,7 +165,7 @@ const [toDate, setToDate] = useState("");
 
         <div className="sm:hidden space-y-4">
 
-          {filtered.map(task => (
+          {combinedTasks.map(task => (
 
             <div
               key={task.id}
@@ -169,11 +207,12 @@ const [toDate, setToDate] = useState("");
 
                 <p>
                   <strong>Date:</strong>{" "}
-                  {task.created_at
-                    ? new Date(task.created_at)
-                        .toLocaleDateString("en-IN")
-                    : "-"
-                  }
+                  {task.displayDate
+  ? new Date(task.displayDate)
+      .toLocaleDateString("en-GB")
+      .replace(/\//g, "-")
+  : "-"
+}
                 </p>
 
               </div>
@@ -201,7 +240,7 @@ const [toDate, setToDate] = useState("");
                 <th className="p-4">Priority</th> */}
                 <th className="p-4">Status</th>
                 <th className="p-4">Hours</th>
-                <th className="p-4">Date</th>
+                <th className="p-5">Date</th>
 
               </tr>
 
@@ -210,7 +249,7 @@ const [toDate, setToDate] = useState("");
 
             <tbody>
 
-              {filtered.map(task => (
+              {combinedTasks.map(task => (
 
                 <tr
                   key={task.id}
@@ -245,12 +284,13 @@ const [toDate, setToDate] = useState("");
                   </td>
 
                   <td className="p-4">
-                    {task.created_at
-                      ? new Date(task.created_at)
-                          .toLocaleDateString("en-IN")
-                      : "-"
-                    }
-                  </td>
+  {task.displayDate
+    ? new Date(task.displayDate)
+        .toLocaleDateString("en-GB")
+        .replace(/\//g, "-")
+    : "-"
+  }
+</td>
 
                 </tr>
 

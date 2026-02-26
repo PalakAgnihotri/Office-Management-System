@@ -10,6 +10,7 @@ function MyTasks() {
     hours: "",
     minutes:"",
     remarks:"",
+    date: new Date().toISOString().split("T")[0]
   });
 
   useEffect(() => {
@@ -32,26 +33,20 @@ const formatTime = (minutes) => {
 
   return `${hrs}h ${mins}m`;
 };
-// const handleMarkComplete = async (taskId) => {
-//   try {
-//     await API.put(`/tasks/employee/${taskId}`,
-//   { status: "Completed" },
-//   {
-//     headers: {
-//       Authorization: `Bearer ${localStorage.getItem("token")}`
-//     }
-//   }
-// );
+const getCurrentDate = () => {
+  const d = new Date();
 
-//     alert("Task marked as completed");
-//     fetchTasks(); // refresh list
-//   } catch (error) {
-//     console.error(error);
-//     alert("Failed to update task");
-//   }
-// };
-  const handleUpdate = async (id) => {
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+
+  return `${day}-${month}-${year}`;
+};
+
+const handleUpdate = async (id) => {
   try {
+    console.log("SENDING DATE:", editData.date);
+    console.log("UPDATING TASK ID:", id);
 
     const totalMinutes =
       (parseInt(editData.hours || 0) * 60) +
@@ -62,7 +57,8 @@ const formatTime = (minutes) => {
       {
         status: editData.status,
         allotted_hours: totalMinutes,
-        remarks: editData.remarks
+        remarks: editData.remarks,
+        work_date : editData.date
       },
       {
         headers: {
@@ -106,8 +102,10 @@ const formatTime = (minutes) => {
         <p className="text-sm">
           <strong>Deadline:</strong>{" "}
           {task.due_date
-            ? new Date(task.due_date).toLocaleDateString()
-            : "N/A"}
+  ? new Date(task.due_date)
+      .toLocaleDateString("en-GB")
+      .replace(/\//g, "-")
+  : "N/A"}
         </p>
 
 
@@ -208,7 +206,29 @@ task.remarks || "—"
           
 
         </div>
-        
+        <p className="text-sm">
+  <strong>Date:</strong>{" "}
+  {isEditing ? (
+    <input
+      type="date"
+      className="border p-1 rounded"
+      value={editData.date}
+      onChange={(e) =>
+        setEditData({
+          ...editData,
+          date: e.target.value
+        })
+      }
+    />
+  ) : (
+    task.work_date
+      ? new Date(task.work_date)
+          .toLocaleDateString("en-GB")
+          .replace(/\//g, "-")
+      : "-"
+  )}
+</p>
+
 
 
         {/* BUTTONS */}
@@ -239,11 +259,14 @@ task.remarks || "—"
                 setEditingId(task.id);
 
                 setEditData({
-                  status: task.status,
-                  hours: Math.floor(total / 60),
-                  minutes: total % 60,
-                  remarks: task.remarks || ""
-                });
+  status: task.status,
+  hours: Math.floor(total / 60),
+  minutes: total % 60,
+  remarks: task.remarks || "",
+  date: task.work_date
+    ? task.work_date.split("T")[0]
+    : new Date().toISOString().split("T")[0]
+});
 
               }}
               className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -269,7 +292,9 @@ task.remarks || "—"
           <th className="p-4">Deadline</th>
           <th className="p-4">Alloted Time</th>
           <th className="p-4">Status</th>
+
           <th className="p-4">Remarks</th>
+          <th className="p-4">Date</th>
           <th className="p-4 text-center">Action</th>
         </tr>
       </thead>
@@ -284,8 +309,10 @@ task.remarks || "—"
 
             <td className="p-4">
               {task.due_date
-                ? new Date(task.due_date).toLocaleDateString()
-                : "N/A"}
+  ? new Date(task.due_date)
+      .toLocaleDateString("en-GB")
+      .replace(/\//g, "-")
+  : "N/A"}
             </td>
 
             <td className="p-4">
@@ -376,54 +403,71 @@ task.remarks || "—"
 )}
 
 </td>
+<td className="p-4">
+  {editingId === task.id ? (
 
-            <td className="p-4 text-center space-x-2">
-              {editingId === task.id ? (
-                <>
-                  <button
-                    onClick={() => handleUpdate(task.id)}
-                    className="bg-green-500 text-white px-3 py-1 rounded"
-                  >
-                    Save
-                  </button>
+    <input
+      type="date"
+      className="border p-1 rounded"
+      value={editData.date || ""}
+      onChange={(e) =>
+        setEditData({
+          ...editData,
+          date: e.target.value
+        })
+      }
+    />
 
-                  <button
-                    onClick={() => setEditingId(null)}
-                    className="bg-gray-400 text-white px-3 py-1 rounded"
-                  >
-                    Cancel
-                  </button>
-                </>
-              ) : (
-                <>
-                  {/* {task.status !== "Completed" && (
-                    <button
-                      onClick={() => handleMarkComplete(task.id)}
-                      className="bg-green-500 text-white px-3 py-1 rounded"
-                    >
-                      Complete
-                    </button>
-                  )} */}
-                  <td className="align-middle">
+  ) : (
 
-                  <button
-                    onClick={() => {
-                      setEditingId(task.id);
-                      setEditData({
-                        status: task.status,
-                        allotted_hours:
-                        task.allotted_hours || "",
-                        remarks: task.remarks || ""
-                      });
-                    }}
-                    className="bg-blue-500 text-white px-3 py-1 rounded"
-                  >
-                    Edit
-                  </button>
-                  </td>
-                </>
-              )}
-            </td>
+    task.work_date
+      ? new Date(task.work_date)
+          .toLocaleDateString("en-GB")
+          .replace(/\//g, "-")
+      : getCurrentDate()
+
+  )}
+</td>
+            <td className="p-4 text-center">
+  {editingId === task.id ? (
+    <div className="flex justify-center gap-2">
+      <button
+        onClick={() => handleUpdate(task.id)}
+        className="bg-green-500 text-white px-3 py-1 rounded"
+      >
+        Save
+      </button>
+
+      <button
+        onClick={() => setEditingId(null)}
+        className="bg-gray-400 text-white px-3 py-1 rounded"
+      >
+        Cancel
+      </button>
+    </div>
+  ) : (
+    <button
+      onClick={() => {
+        const total = task.allotted_hours || 0;
+
+        setEditingId(task.id);
+
+        setEditData({
+          status: task.status,
+          hours: Math.floor(total / 60),
+          minutes: total % 60,
+          remarks: task.remarks || "",
+          date: task.work_date
+            ? task.work_date.split("T")[0]
+            : new Date().toISOString().split("T")[0]
+        });
+      }}
+      className="bg-blue-500 text-white px-3 py-1 rounded"
+    >
+      Edit
+    </button>
+  )}
+</td>
           </tr>
         ))}
       </tbody>

@@ -55,6 +55,7 @@ const getAllTasks = async (req, res) => {
     t.status,
     t.due_date,
     t.remarks,
+    t.work_date,
     t.allotted_hours,
     e.name AS employee_name
   FROM tasks t
@@ -85,7 +86,7 @@ console.log("JWT USER:", req.user);
 const updateTask = async (req, res) => {
   try {
     const taskId = req.params.id;
-    const { title, description, priority, status, due_date, allotted_hours, employee_id, remarks } = req.body;
+    const { title, description, priority, status, due_date, allotted_hours, employee_id, remarks, work_date } = req.body;
 
     await db.execute(
       `UPDATE tasks 
@@ -96,7 +97,8 @@ const updateTask = async (req, res) => {
            due_date = ?, 
            allotted_hours = ?,
            assigned_to = ?,
-           remarks =? 
+           remarks =?,
+           work_date =?
            WHERE id = ?`,
       [
         title,
@@ -108,6 +110,7 @@ const updateTask = async (req, res) => {
         allotted_hours !== undefined ? allotted_hours : null,
         employee_id ? parseInt(employee_id) : null,
         remarks || null,
+        work_date || null,
         taskId
       ]
     );
@@ -206,19 +209,37 @@ const deleteTask = async (req, res) => {
 const updateTaskByEmployee = async (req, res) => {
   try {
     const taskId = req.params.id;
-    const { status, allotted_hours , remarks} = req.body;
 
-    await db.execute(
+    const {
+      status,
+      allotted_hours,
+      remarks,
+      work_date
+    } = req.body;
+
+    console.log("UPDATE REQUEST:", {
+      taskId,
+      status,
+      allotted_hours,
+      remarks,
+      work_date,
+      user: req.user.id
+    });
+
+    const [result] = await db.execute(
       `UPDATE tasks 
-       SET status = ?, allotted_hours = ? , remarks =?
-       WHERE id = ? AND assigned_to = ?`,
+       SET status = ?, allotted_hours = ?, remarks = ?, work_date = ?
+       WHERE id = ?`,
       [
         status || "Pending",
-        allotted_hours !== undefined ? allotted_hours : null, remarks || null,
-        taskId,
-        req.user.id
+        allotted_hours ?? null,
+        remarks ?? null,
+        work_date ?? null,
+        taskId
       ]
     );
+
+    console.log("ROWS UPDATED:", result.affectedRows);
 
     res.json({ message: "Task updated successfully" });
 
@@ -286,6 +307,7 @@ const getEntryTasks = async (req, res) => {
              t.allotted_hours,
              t.assigned_to,
              t.remarks,
+             t.work_date,
              e.name AS employee_name
       FROM tasks t
       LEFT JOIN employees e ON t.assigned_to = e.id
