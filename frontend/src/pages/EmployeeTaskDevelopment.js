@@ -282,13 +282,13 @@ className="border p-3 rounded w-full mb-4"
         <div className="flex gap-4 mt-4">
           <button
             onClick={() => handleEdit(task)}
-            className="text-blue-600 font-medium"
+            className="bg-blue-500 text-white px-3 py-1 rounded"
           >
             Edit
           </button>
           <button
             onClick={() => handleDelete(task.id)}
-            className="text-red-600 font-medium"
+            className="bg-red-600 text-white px-3 py-1 rounded"
           >
             Delete
           </button>
@@ -344,19 +344,21 @@ className="border p-3 rounded w-full mb-4"
                   }m`
                 : "-"}
             </td>
+            <td className="align-middle">
             <td className="px-2 flex gap-3">
               <button
                 onClick={() => handleEdit(task)}
-                className="text-blue-600 hover:underline"
+                className="bg-blue-500 text-white px-3 py-1 rounded"
               >
                 Edit
               </button>
               <button
                 onClick={() => handleDelete(task.id)}
-                className="text-red-600 hover:underline"
+                className="bg-red-600 text-white px-3 py-1 rounded"
               >
                 Delete
               </button>
+            </td>
             </td>
           </tr>
         ))}

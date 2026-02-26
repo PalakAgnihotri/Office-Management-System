@@ -276,7 +276,7 @@ function TaskDevelopment() {
           {/* <p><strong>Employee:</strong> {task.employee_name || "Unassigned"}</p> */}
           <p><strong>Status:</strong> {task.status}</p>
           <p>
-          <strong>Date:</strong>
+            <strong>Date:</strong>
               {task.due_date
   ? new Date(task.due_date).toLocaleDateString("en-IN")
   : "-"}
