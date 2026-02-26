@@ -59,8 +59,10 @@ function TaskEntry() {
 
     if (editingId) {
       await API.put(`/tasks/${editingId}`, payload);
+      alert("Task Updated Successfully");
     } else {
       await API.post("/tasks/create", payload);
+      alert("Task Saved Successfully");
     }
 
     fetchAssignedTasks();
@@ -107,6 +109,7 @@ function TaskEntry() {
   const handleDelete = async (id) => {
     try {
       await API.delete(`/tasks/${id}`);
+      alert("Task Deleted");
       fetchAssignedTasks();
     } catch (err) {
       console.log("Delete error:", err);
