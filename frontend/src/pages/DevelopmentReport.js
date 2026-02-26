@@ -6,6 +6,10 @@ function DevelopmentReport() {
 
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState("");
+  
+  const [fromDate, setFromDate] = useState("");
+const [toDate, setToDate] = useState("");
+
 
 
   useEffect(() => {
@@ -28,9 +32,20 @@ function DevelopmentReport() {
   };
 
 
-  const filtered = tasks.filter((task) =>
-    task.title?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = tasks.filter((task) => {
+  const matchesTitle = task.title
+    ?.toLowerCase()
+    .includes(search.toLowerCase());
+
+  const taskDate = task.created_at
+    ? new Date(task.created_at).toISOString().split("T")[0]
+    : null;
+
+  const matchesFrom = fromDate ? taskDate >= fromDate : true;
+  const matchesTo = toDate ? taskDate <= toDate : true;
+
+  return matchesTitle && matchesFrom && matchesTo;
+});
 
 
   return (
@@ -44,14 +59,68 @@ function DevelopmentReport() {
       <div className="bg-white p-4 sm:p-6 rounded-2xl shadow">
 
         {/* SEARCH */}
+<div className="bg-gradient-to-r from-purple-50 to-white border rounded-2xl p-4 sm:p-6 shadow mb-6">
 
-        <input
-          type="text"
-          placeholder="Search development tasks..."
-          value={search}
-          onChange={(e)=>setSearch(e.target.value)}
-          className="border p-3 rounded-lg w-full sm:w-1/2 mb-6"
-        />
+  <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+
+    {/* From */}
+    <div className="flex flex-col w-full sm:w-[160px]">
+      <label className="text-sm font-medium text-gray-600 mb-1">
+        From
+      </label>
+      <input
+        type="date"
+        value={fromDate}
+        onChange={(e) => setFromDate(e.target.value)}
+        className="border px-3 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition w-full text-sm"
+      />
+    </div>
+
+    {/* To */}
+    <div className="flex flex-col w-full sm:w-[160px]">
+      <label className="text-sm font-medium text-gray-600 mb-1">
+        To
+      </label>
+      <input
+        type="date"
+        value={toDate}
+        onChange={(e) => setToDate(e.target.value)}
+        className="border px-3 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition w-full text-sm"
+      />
+    </div>
+
+    {/* Search */}
+    {/* Search + Clear */}
+<div className="flex flex-col flex-1">
+  <label className="text-sm font-medium text-gray-600 mb-1">
+    Search Task
+  </label>
+
+  <div className="flex gap-2">
+    <input
+      type="text"
+      placeholder="Search development tasks..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="border px-3 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition w-full text-sm"
+    />
+
+    <button
+      onClick={() => {
+        setSearch("");
+        setFromDate("");
+        setToDate("");
+      }}
+      className="px-4 py-2 text-sm rounded-lg bg-gray-200 hover:bg-gray-300 transition whitespace-nowrap"
+    >
+      Clear
+    </button>
+  </div>
+</div>
+
+  </div>
+
+</div>
 
 
         {/* MOBILE VIEW */}

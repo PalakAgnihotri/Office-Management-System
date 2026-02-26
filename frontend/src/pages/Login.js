@@ -10,9 +10,13 @@ function Login() {
     email: "",
     password: ""
   });
+    const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
   try {
+    setLoading(true);   // start loading
+      setError("");
     const res = await API.post("/auth/login", form);
 
     console.log("LOGIN RESPONSE:", res.data);  
@@ -30,7 +34,10 @@ function Login() {
 
   } catch (err) {
     alert("Invalid credentials");
+  } finally{
+    setLoading(false);
   }
+
 };
 
   return (
@@ -51,11 +58,21 @@ function Login() {
       />
 
       <button
-        onClick={handleLogin}
-        className="w-full py-4 rounded-full text-white font-semibold text-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition"
-      >
-        Login →
-      </button>
+  onClick={handleLogin}
+  disabled={loading}
+  className="w-full py-4 rounded-full text-white font-semibold text-lg 
+  bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition
+  flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+>
+  {loading ? (
+    <>
+      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      Logging in...
+    </>
+  ) : (
+    "Login"
+  )}
+</button>
 
       <p className="text-center mt-6 text-gray-600">
         Don’t have an account?{" "}

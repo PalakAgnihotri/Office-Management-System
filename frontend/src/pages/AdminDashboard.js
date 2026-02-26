@@ -8,7 +8,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Cell
 } from "recharts";
 function AdminDashboard() {
   const [data, setData] = useState(null);
@@ -24,10 +25,10 @@ function AdminDashboard() {
 
   if (!data) return <h2 className="text-black p-4 sm:p-6 lg:p-8">Loading...</h2>;
   const chartData = [
-  { name: "Total", value: data.totalTasks },
-  { name: "Pending", value: data.pendingTasks },
-  { name: "Completed", value: data.completedTasks },
-  { name: "Overdue", value: data.overdueTasks }
+  { name: "Total", value: data.totalTasks ?? 0, color: "#7c3aed" },   // purple
+  { name: "Pending", value: data.pendingTasks ?? 0, color: "#ec4899" }, // pink
+  { name: "Completed", value: data.completedTasks ?? 0, color: "#14b8a6" }, // teal
+  { name: "Overdue", value: data.overdueTasks ?? 0, color: "#ef4444" } // red
 ];
 
   return (
@@ -66,12 +67,11 @@ function AdminDashboard() {
         <XAxis dataKey="name" tick={{ fontSize: 14 }} />
         <YAxis allowDecimals={false} />
         <Tooltip />
-        <Bar
-          dataKey="value"
-          fill="#7c3aed"
-          radius={[8, 8, 0, 0]}
-          barSize={80}
-        />
+        <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={80}>
+  {chartData.map((entry, index) => (
+    <Cell key={`cell-${index}`} fill={entry.color} />
+  ))}
+</Bar>
       </BarChart>
     </ResponsiveContainer>
   </div>

@@ -8,11 +8,14 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Cell
 } from "recharts";
 
 function EmployeeDashboard() {
   const [tasks, setTasks] = useState([]);
+  
+
 
   const fetchTasks = async () => {
     try {
@@ -34,14 +37,12 @@ function EmployeeDashboard() {
     t => new Date(t.due_date) < new Date() && t.status !== "Completed"
   ).length;
 
-  // ✅ chart data
   const chartData = [
-    { name: "Total", value: total },
-    { name: "Pending", value: pending },
-    { name: "Completed", value: completed },
-    { name: "Overdue", value: overdue }
-  ];
-
+  { name: "Total", value: total, color: "#7c3aed" },
+  { name: "Pending", value: pending, color: "#ec4899" },
+  { name: "Completed", value: completed, color: "green" },
+  { name: "Overdue", value: overdue, color: "red" }
+];
   return (
     <EmployeeLayout>
       <h1 className="text-3xl font-bold mb-8">My Dashboard</h1>
@@ -65,12 +66,11 @@ function EmployeeDashboard() {
               <XAxis dataKey="name" />
               <YAxis allowDecimals={false} />
               <Tooltip />
-              <Bar
-                dataKey="value"
-                fill="#7c3aed"
-                radius={[8, 8, 0, 0]}
-                barSize={80}
-              />
+              <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={80}>
+  {chartData.map((entry, index) => (
+    <Cell key={`cell-${index}`} fill={entry.color} />
+  ))}
+</Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
