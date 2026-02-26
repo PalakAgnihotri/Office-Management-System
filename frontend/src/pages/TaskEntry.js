@@ -42,6 +42,14 @@ function TaskEntry() {
 
   const handleSave = async () => {
   try {
+    if (
+      !form.title ||
+      form.priority === "Select Task Priority" ||
+      form.status === "Select Status"
+    ) {
+      alert("Fill all required fields");
+      return;
+    }
     const totalMinutes =
       (parseInt(form.hours || 0) * 60) +
       parseInt(form.minutes || 0);
@@ -60,6 +68,7 @@ function TaskEntry() {
     if (editingId) {
       await API.put(`/tasks/${editingId}`, payload);
       alert("Task Updated Successfully");
+
     } else {
       await API.post("/tasks/create", payload);
       alert("Task Saved Successfully");
@@ -82,6 +91,7 @@ function TaskEntry() {
 
   } catch (err) {
     console.log(err);
+    alert("Error saving task");
   }
 };
 
@@ -173,6 +183,8 @@ function TaskEntry() {
             <option>Pending</option>
             <option>In-progress</option>
             <option>Completed</option>
+            <option>On-Hold</option>
+            <option>Cancelled</option>
           </select>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full">
@@ -236,10 +248,12 @@ function TaskEntry() {
           </div>
 
           <button
+
             onClick={handleSave}
             className="bg-cyan-600 text-white px-6 py-2 rounded-lg"
           >
             {editingId ? "Update Task" : "Save Task"}
+            
           </button>
 
         </div>

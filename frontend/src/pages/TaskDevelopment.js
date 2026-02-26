@@ -67,7 +67,11 @@ function TaskDevelopment() {
         alert("Task Updated Successfully");
       } else {
         await API.post("/development/create", payload);
+
         alert("Task Saved Successfully");
+
+        alert("Task Created Successfully");
+
       }
 
       fetchTasks();
@@ -120,7 +124,9 @@ function TaskDevelopment() {
   const handleDelete = async (id) => {
     try {
       await API.delete(`/development/${id}`);
+
       alert("Task Deleted");
+
       fetchTasks();
     } catch (err) {
       console.log(err);
@@ -161,32 +167,9 @@ function TaskDevelopment() {
             className="border p-3 rounded-lg"
           />
 
-          {/* <select
-            value={form.employee_id}
-            onChange={(e) =>
-              setForm({ ...form, employee_id: e.target.value })
-            }
-            className="border p-3 rounded-lg"
-          >
-            <option value="">Select Employee</option>
-            {employees.map((emp) => (
-              <option key={emp.id} value={emp.id}>
-                {emp.name}
-              </option>
-            ))}
-          </select> */}
+          
 
-          {/* <select
-            value={form.priority}
-            onChange={(e) =>
-              setForm({ ...form, priority: e.target.value })
-            }
-            className="border p-3 rounded-lg"
-          >
-            <option>Low</option>
-            <option>Medium</option>
-            <option>High</option>
-          </select> */}
+          
 
           <select
           
@@ -201,6 +184,8 @@ function TaskDevelopment() {
             <option>Pending</option>
             <option>In-progress</option>
             <option>Completed</option>
+            <option>On-Hold</option>
+            <option>Cancelled</option>
           </select>
           <div className="flex flex-col sm:flex-row gap-4 w-full">
 

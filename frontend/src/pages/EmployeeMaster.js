@@ -65,6 +65,7 @@ function EmployeeMaster() {
 
   const handleDelete = async (id) => {
     await API.delete(`/employees/${id}`);
+    alert("Employee Deleted");
     fetchEmployees();
   };
 
