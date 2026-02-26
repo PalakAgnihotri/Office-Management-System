@@ -57,7 +57,7 @@ function EmployeeProfile() {
           <p className="font-semibold">{profile.designation || "N/A"}</p>
         </div>
 
-        <<div className="mb-4">
+        <div className="mb-4">
   <p className="text-gray-500">Joining Date</p>
   <p className="font-semibold">
     {profile.joining_date
