@@ -57,14 +57,16 @@ function EmployeeProfile() {
           <p className="font-semibold">{profile.designation || "N/A"}</p>
         </div>
 
-        <div className="mb-4">
-          <p className="text-gray-500">Joining Date</p>
-          <p className="font-semibold">
-            {profile.joining_date
-              ? new Date(profile.joining_date).toLocaleDateString()
-              : "N/A"}
-          </p>
-        </div>
+        <<div className="mb-4">
+  <p className="text-gray-500">Joining Date</p>
+  <p className="font-semibold">
+    {profile.joining_date
+      ? new Date(profile.joining_date)
+          .toLocaleDateString("en-GB")  
+          .replaceAll("/", "-")         
+      : "N/A"}
+  </p>
+</div>
 
       </div>
     </EmployeeLayout>
