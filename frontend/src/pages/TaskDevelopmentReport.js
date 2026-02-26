@@ -16,18 +16,22 @@ const [toDate, setToDate] = useState("");
 
 
   const fetchTasks = async () => {
-    try {
+  try {
+    const res = await API.get("/employee-development/my");
 
-      const res = await API.get("/development/all");
-
+    if (Array.isArray(res.data)) {
       setTasks(res.data);
-
-    } catch (err) {
-
-      console.log(err);
-
+    } else if (Array.isArray(res.data.tasks)) {
+      setTasks(res.data.tasks);
+    } else {
+      setTasks([]);
     }
-  };
+
+  } catch (err) {
+    console.log(err);
+    setTasks([]);
+  }
+};
 
 
   const filtered = tasks.filter((task) => {
@@ -35,8 +39,8 @@ const [toDate, setToDate] = useState("");
     ?.toLowerCase()
     .includes(search.toLowerCase());
 
-  const taskDate = task.created_at
-    ? new Date(task.created_at).toISOString().split("T")[0]
+  const taskDate = task.due_date
+    ? new Date(task.due_date).toISOString().split("T")[0]
     : null;
 
   const matchesFrom = fromDate ? taskDate >= fromDate : true;
@@ -55,9 +59,6 @@ const [toDate, setToDate] = useState("");
 
       <div className="bg-white p-4 sm:p-6 rounded-2xl shadow">
 
-        {/* SEARCH */}
-
-{/* Filters */}
 {/* Filters */}
 <div className="bg-gradient-to-r from-purple-50 to-white border rounded-2xl p-4 sm:p-6 shadow mb-6">
 
