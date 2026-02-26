@@ -67,9 +67,6 @@ function TaskDevelopment() {
         alert("Task Updated Successfully");
       } else {
         await API.post("/development/create", payload);
-
-        alert("Task Saved Successfully");
-
         alert("Task Created Successfully");
 
       }
