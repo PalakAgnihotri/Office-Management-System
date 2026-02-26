@@ -130,6 +130,8 @@ const formatTime = (minutes) => {
               <option>Pending</option>
               <option>In-progress</option>
               <option>Completed</option>
+              <option>On-Hold</option>
+              <option>Cancelled</option>
             </select>
           ) : (
             task.status
@@ -335,6 +337,8 @@ task.remarks || "—"
                   <option>Pending</option>
                   <option>In-progress</option>
                   <option>Completed</option>
+                  <option>On-Hold</option>
+                  <option>Cancelled</option>
                 </select>
               ) : (
                 <span
