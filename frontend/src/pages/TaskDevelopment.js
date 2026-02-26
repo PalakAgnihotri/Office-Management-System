@@ -64,8 +64,10 @@ function TaskDevelopment() {
 
       if (editingId) {
         await API.put(`/development/${editingId}`, payload);
+        alert("Task Updated Successfully");
       } else {
         await API.post("/development/create", payload);
+        alert("Task Saved Successfully");
       }
 
       fetchTasks();
@@ -118,6 +120,7 @@ function TaskDevelopment() {
   const handleDelete = async (id) => {
     try {
       await API.delete(`/development/${id}`);
+      alert("Task Deleted");
       fetchTasks();
     } catch (err) {
       console.log(err);
