@@ -26,7 +26,7 @@ return (
         </button>
 
         <h1 className="text-purple-600 font-bold">
-          TaskFlow
+          Taskify
         </h1>
       </div>
 
