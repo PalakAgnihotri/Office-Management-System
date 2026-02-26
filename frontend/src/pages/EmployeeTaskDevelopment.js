@@ -74,12 +74,12 @@ allotted_hours:totalMinutes
 if(editingId){
 
 await API.put(`/employee-development/${editingId}`, payload)
-
+alert("Task Edited Successfully");
 }
 else{
 
 await API.post("/employee-development/create",payload);
-
+alert("Task Saved Successfully");
 }
 
 setForm({
@@ -147,7 +147,7 @@ const handleEdit = (task) => {
 const handleDelete=async(editingId)=>{
 
 await API.delete(`/employee-development/${editingId}`);
-
+alert("Task Deleted Successfully");
 fetchTasks();
 
 };
