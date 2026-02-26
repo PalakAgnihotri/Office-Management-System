@@ -36,7 +36,7 @@ function Sidebar({ role, onLogout, closeSidebar }) {
       {/* HEADER */}
       <div className="flex items-center justify-between p-6 border-b">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-          TaskFlow
+          Taskify
         </h2>
 
         {/* Close button mobile */}
