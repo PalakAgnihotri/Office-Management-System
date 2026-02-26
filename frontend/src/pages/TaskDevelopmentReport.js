@@ -16,25 +16,22 @@ const [toDate, setToDate] = useState("");
 
 
   const fetchTasks = async () => {
-  try {
-    const res = await API.get("/employee-development/my");
+    try {
 
-    if (Array.isArray(res.data)) {
+      const res = await API.get("/development/all");
+
       setTasks(res.data);
-    } else if (Array.isArray(res.data.tasks)) {
-      setTasks(res.data.tasks);
-    } else {
-      setTasks([]);
-    }
 
-  } catch (err) {
-    console.log(err);
-    setTasks([]);
-  }
-};
+    } catch (err) {
+
+      console.log(err);
+
+    }
+  };
 
 
   const filtered = tasks.filter((task) => {
+
   const matchesTitle = task.title
     ?.toLowerCase()
     .includes(search.toLowerCase());
@@ -169,10 +166,9 @@ const [toDate, setToDate] = useState("");
 
                 <p>
                   <strong>Date:</strong>{" "}
-                  {task.created_at
-                    ? new Date(task.created_at)
-                        .toLocaleDateString("en-IN")
-                    : "-"
+                  {task.due_date
+  ? new Date(task.due_date).toLocaleDateString("en-IN")
+  : "-"
                   }
                 </p>
 
@@ -245,10 +241,9 @@ const [toDate, setToDate] = useState("");
                   </td>
 
                   <td className="p-4">
-                    {task.created_at
-                      ? new Date(task.created_at)
-                          .toLocaleDateString("en-IN")
-                      : "-"
+                    {task.due_date
+  ? new Date(task.due_date).toLocaleDateString("en-IN")
+  : "-"
                     }
                   </td>
 
