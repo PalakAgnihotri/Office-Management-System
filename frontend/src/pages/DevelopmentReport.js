@@ -258,19 +258,6 @@ Development Tasks Report
             placeholder="Search task"
             className="border rounded-lg px-3 py-2 text-sm w-[220px]"
           />
-
-//           <button
-//   onClick={()=>{
-//     setSearch("");
-//     const today=getToday();
-//     setFromDate(today);
-//     setToDate(today);
-//   }}
-//   className="bg-purple-500 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm flex items-center gap-2"
-// >
-//   🔄 Refresh
-// </button>
-
         </div>
 
       </div>
