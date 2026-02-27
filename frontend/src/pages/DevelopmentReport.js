@@ -44,9 +44,28 @@ function DevelopmentReport() {
   };
 
   /* FILTER */
-  const filtered = tasks.filter(task =>
-    task.title?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered =
+  fromDate && toDate
+    ? tasks.filter(task => {
+
+        const titleMatch =
+          task.title?.toLowerCase()
+          .includes(search.toLowerCase());
+
+        if (!task.due_date) return false;
+
+        const taskDate =
+          new Date(task.due_date)
+          .toISOString()
+          .split("T")[0];
+
+        return (
+          titleMatch &&
+          taskDate >= fromDate &&
+          taskDate <= toDate
+        );
+      })
+    : tasks;
 
   const filteredMyTasks =
     fromDate && toDate
