@@ -4,263 +4,559 @@ import AdminLayout from "../layouts/AdminLayout";
 
 function TaskDevelopmentReport() {
 
+  const getToday = () =>
+    new Date().toISOString().split("T")[0];
+
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState("");
-  const [fromDate, setFromDate] = useState("");
-const [toDate, setToDate] = useState("");
+  const [fromDate, setFromDate] = useState(getToday());
+  const [toDate, setToDate] = useState(getToday());
 
 
+  /* FETCH */
   useEffect(() => {
     fetchTasks();
   }, []);
 
-
   const fetchTasks = async () => {
     try {
 
-      const res = await API.get("/development/all");
+      const res =
+        await API.get("/development/all");
 
-      setTasks(res.data);
+      setTasks(
+        Array.isArray(res.data)
+          ? res.data
+          : []
+      );
 
-    } catch (err) {
+    } catch {
 
-      console.log(err);
+      setTasks([]);
 
     }
   };
 
 
-  const filtered = tasks.filter((task) => {
+  /* FILTER */
+  const filtered =
+    tasks.filter(task => {
 
-  const matchesTitle = task.title
-    ?.toLowerCase()
-    .includes(search.toLowerCase());
+      const titleMatch =
+        task.title
+        ?.toLowerCase()
+        .includes(
+          search.toLowerCase()
+        );
 
-  const taskDate = task.due_date
-    ? new Date(task.due_date).toISOString().split("T")[0]
-    : null;
+      if (!task.due_date)
+        return false;
 
-  const matchesFrom = fromDate ? taskDate >= fromDate : true;
-  const matchesTo = toDate ? taskDate <= toDate : true;
+      const taskDate =
+        new Date(task.due_date)
+        .toISOString()
+        .split("T")[0];
 
-  return matchesTitle && matchesFrom && matchesTo;
-});
+      return (
+        titleMatch &&
+        taskDate >= fromDate &&
+        taskDate <= toDate
+      );
+
+    });
+
+
+  /* STATUS COLOR */
+  const getStatusColor = (status) => {
+
+  switch (status?.toLowerCase()) {
+
+    case "completed":
+      return "bg-green-100 text-green-700";
+
+    case "in-progress":
+      return "bg-yellow-100 text-yellow-700";
+
+    case "pending":
+      return "bg-red-100 text-red-700";
+
+    default:
+      return "bg-gray-100 text-gray-700";
+  }
+
+};
+
+
+  /* PRINT */
+  const handlePrint = () => {
+
+    const win =
+      window.open(
+        "",
+        "",
+        "width=900,height=700"
+      );
+
+    const rows =
+      filtered.map(task => `
+<tr>
+<td>
+TD${String(task.id).padStart(3,"0")}
+</td>
+
+<td>
+${task.title}
+</td>
+
+<td>
+${task.status}
+</td>
+
+<td>
+${
+task.allotted_hours
+? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
+: "-"
+}
+</td>
+
+<td>
+${
+task.due_date
+? new Date(task.due_date).toLocaleDateString("en-GB")
+: "-"
+}
+</td>
+
+</tr>
+`).join("");
+
+    win.document.write(`
+
+<html>
+
+<head>
+
+<title>
+Task Development Report
+</title>
+
+<style>
+
+body{
+font-family:Arial;
+padding:20px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:8px;
+}
+
+th{
+background:#f3f3f3;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>
+Task Development Report
+</h2>
+
+<table>
+
+<thead>
+
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Status</th>
+<th>Hours</th>
+<th>Date</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+${rows}
+
+</tbody>
+
+</table>
+
+</body>
+
+</html>
+`);
+
+    win.document.close();
+
+    win.print();
+  };
+
+
+  /* EXPORT CSV */
+  const handleExportCSV =
+    () => {
+
+      const headers =
+        [
+          "ID",
+          "Title",
+          "Status",
+          "Hours",
+          "Date"
+        ];
+
+      const rows =
+        filtered.map(task => [
+
+          `TD${String(
+            task.id
+          ).padStart(3,"0")}`,
+
+          task.title,
+
+          task.status,
+
+          task.allotted_hours
+          ? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
+          : "-",
+
+          task.due_date
+          ? new Date(task.due_date)
+          .toLocaleDateString("en-GB")
+          : "-"
+
+        ]);
+
+      const csv =
+        "data:text/csv;charset=utf-8," +
+        [headers,...rows]
+        .map(r => r.join(","))
+        .join("\n");
+
+      const link =
+        document.createElement("a");
+
+      link.href =
+        encodeURI(csv);
+
+      link.download =
+        "task_development_report.csv";
+
+      link.click();
+    };
+
 
   return (
-    <AdminLayout>
 
-      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-6">
-        Task Development report
-      </h1>
+<AdminLayout>
+
+<div className="max-w-6xl mx-auto">
+
+<h1 className="text-xl sm:text-2xl font-bold mb-6">
+Task Development Report
+</h1>
 
 
-      <div className="bg-white p-4 sm:p-6 rounded-2xl shadow">
+{/* FILTER CARD */}
 
-{/* Filters */}
-<div className="bg-gradient-to-r from-purple-50 to-white border rounded-2xl p-4 sm:p-6 shadow mb-6">
+<div className="bg-white border rounded-2xl p-4 sm:p-6 shadow mb-6">
 
-  <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+<div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
 
-    {/* From */}
-    <div className="flex flex-col w-full sm:w-[160px]">
-      <label className="text-sm font-medium text-gray-600 mb-1">
-        From
-      </label>
-      <input
-        type="date"
-        value={fromDate}
-        onChange={(e) => setFromDate(e.target.value)}
-        className="border px-3 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition w-full text-sm"
-      />
-    </div>
 
-    {/* To */}
-    <div className="flex flex-col w-full sm:w-[160px]">
-      <label className="text-sm font-medium text-gray-600 mb-1">
-        To
-      </label>
-      <input
-        type="date"
-        value={toDate}
-        onChange={(e) => setToDate(e.target.value)}
-        className="border px-3 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition w-full text-sm"
-      />
-    </div>
+<div className="flex flex-wrap items-end gap-4">
 
-    {/* Search */}
-    {/* Search + Clear */}
-<div className="flex flex-col flex-1">
-  <label className="text-sm font-medium text-gray-600 mb-1">
-    Search Task
-  </label>
+<div className="flex flex-col">
 
-  <div className="flex gap-2">
-    <input
-      type="text"
-      placeholder="Search development tasks..."
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-      className="border px-3 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition w-full text-sm"
-    />
+<label className="text-sm text-gray-600 mb-1">
+From
+</label>
 
-    <button
-      onClick={() => {
-        setSearch("");
-        setFromDate("");
-        setToDate("");
-      }}
-      className="px-4 py-2 text-sm rounded-lg bg-gray-200 hover:bg-gray-300 transition whitespace-nowrap"
-    >
-      Clear
-    </button>
-  </div>
-</div>
-
-  </div>
+<input
+type="date"
+value={fromDate}
+onChange={(e)=>
+setFromDate(
+e.target.value
+)
+}
+className="border rounded-lg px-3 py-2 text-sm w-[160px]"
+/>
 
 </div>
 
-        {/* MOBILE VIEW */}
 
-        <div className="sm:hidden space-y-4">
+<div className="flex flex-col">
 
-          {filtered.map(task => (
+<label className="text-sm text-gray-600 mb-1">
+To
+</label>
 
-            <div
-              key={task.id}
-              className="border rounded-xl p-4 shadow-sm bg-gray-50"
-            >
+<input
+type="date"
+value={toDate}
+onChange={(e)=>
+setToDate(
+e.target.value
+)
+}
+className="border rounded-lg px-3 py-2 text-sm w-[160px]"
+/>
 
-              <div className="flex justify-between">
-
-                <h2 className="font-semibold text-lg">
-                  {task.title}
-                </h2>
-
-                <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">
-                  {task.priority}
-                </span>
-
-              </div>
+</div>
 
 
-              <div className="text-sm mt-2 space-y-1">
+<div className="flex flex-col">
 
-                {/* <p>
-                  <strong>Employee:</strong>{" "}
-                  {task.employee_name || "Unassigned"}
-                </p> */}
+<label className="text-sm text-gray-600 mb-1">
+Search
+</label>
 
-                <p>
-                  <strong>Status:</strong>{" "}
-                  {task.status}
-                </p>
+<input
+value={search}
+onChange={(e)=>
+setSearch(
+e.target.value
+)
+}
+placeholder="Search task"
+className="border rounded-lg px-3 py-2 text-sm w-[220px]"
+/>
 
-                <p>
-                  <strong>Hours:</strong>{" "}
-                  {task.allotted_hours
-                    ? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
-                    : "-"
-                  }
-                </p>
+</div>
 
-                <p>
-                  <strong>Date:</strong>{" "}
-                  {task.due_date
-  ? new Date(task.due_date).toLocaleDateString("en-IN")
-  : "-"
-                  }
-                </p>
-
-              </div>
-
-            </div>
-
-          ))}
-
-        </div>
+</div>
 
 
-        {/* DESKTOP TABLE */}
+<div className="flex items-end gap-3">
 
-        <div className="hidden sm:block overflow-x-auto">
+{/* <button
+onClick={()=>{
 
-          <table className="w-full text-left">
+setSearch("");
 
-            <thead>
+const today =
+getToday();
 
-              <tr className="border-b bg-gray-50 text-sm uppercase">
+setFromDate(today);
 
-                <th className="p-4">ID</th>
-                <th className="p-4">Title</th>
-                {/* <th className="p-4">Employee</th>
-                <th className="p-4">Priority</th> */}
-                <th className="p-4">Status</th>
-                <th className="p-4">Hours</th>
-                <th className="p-4">Date</th>
+setToDate(today);
 
-              </tr>
+}}
+className="bg-purple-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-purple-700"
+>
 
-            </thead>
+Refresh
 
-
-            <tbody>
-
-              {filtered.map(task => (
-
-                <tr
-                  key={task.id}
-                  className="border-b hover:bg-gray-50"
-                >
-
-                  <td className="p-4">
-                    TD{String(task.id).padStart(3,"0")}
-                  </td>
-
-                  <td className="p-4 font-medium">
-                    {task.title}
-                  </td>
-
-                  {/* <td className="p-4">
-                    {task.employee_name || "-"}
-                  </td> */}
-
-                  {/* <td className="p-4">
-                    {task.priority}
-                  </td> */}
-
-                  <td className="p-4">
-                    {task.status}
-                  </td>
-
-                  <td className="p-4">
-                    {task.allotted_hours
-                      ? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
-                      : "-"
-                    }
-                  </td>
-
-                  <td className="p-4">
-                    {task.due_date
-  ? new Date(task.due_date).toLocaleDateString("en-IN")
-  : "-"
-                    }
-                  </td>
-
-                </tr>
-
-              ))}
-
-            </tbody>
-
-          </table>
-
-        </div>
+</button> */}
 
 
-      </div>
+<button
+onClick={handlePrint}
+className="bg-red-600 text-white px-5 py-2 rounded-lg text-sm"
+>
 
-    </AdminLayout>
+Print
+
+</button>
+
+
+<button
+onClick={handleExportCSV}
+className="bg-green-600 text-white px-5 py-2 rounded-lg text-sm"
+>
+
+Export
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div className="text-sm text-gray-500 mb-2">
+Total Tasks:
+{filtered.length}
+</div>
+
+
+{/* MOBILE */}
+
+<div className="sm:hidden space-y-4">
+
+{filtered.map(task => (
+
+<div
+key={task.id}
+className="border rounded-xl p-4 shadow bg-white"
+>
+
+<div className="flex justify-between">
+
+<h2 className="font-semibold">
+{task.title}
+</h2>
+
+<span className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}>
+
+{task.status}
+
+</span>
+
+</div>
+
+
+<div className="text-sm mt-2 space-y-1">
+
+<div>
+
+Hours:
+
+{task.allotted_hours
+? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
+: "-"}
+
+</div>
+
+
+<div>
+
+Date:
+
+{task.due_date
+? new Date(task.due_date)
+.toLocaleDateString("en-GB")
+: "-"}
+
+</div>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+
+{/* DESKTOP */}
+
+<div className="hidden sm:block overflow-x-auto bg-white rounded-xl shadow">
+
+<table className="w-full">
+
+<thead className="bg-gray-50">
+
+<tr>
+
+<th className="p-3 text-left text-sm">
+ID
+</th>
+
+<th className="p-3 text-left text-sm">
+Title
+</th>
+
+<th className="p-3 text-left text-sm">
+Status
+</th>
+
+<th className="p-3 text-left text-sm">
+Hours
+</th>
+
+<th className="p-3 text-left text-sm">
+Date
+</th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+{filtered.map(task => (
+
+<tr
+key={task.id}
+className="border-t"
+>
+
+<td className="p-3 text-sm">
+
+TD{String(task.id).padStart(3,"0")}
+
+</td>
+
+
+<td className="p-3 text-sm font-medium">
+
+{task.title}
+
+</td>
+
+
+<td className="p-3">
+
+<span className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}>
+
+{task.status}
+
+</span>
+
+</td>
+
+
+<td className="p-3 text-sm">
+
+{task.allotted_hours
+? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
+: "-"}
+
+</td>
+
+
+<td className="p-3 text-sm">
+
+{task.due_date
+? new Date(task.due_date)
+.toLocaleDateString("en-GB")
+: "-"}
+
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
+
+</div>
+
+</AdminLayout>
+
   );
 
 }
