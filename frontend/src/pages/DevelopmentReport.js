@@ -259,17 +259,17 @@ Development Tasks Report
             className="border rounded-lg px-3 py-2 text-sm w-[220px]"
           />
 
-          <button
-  onClick={()=>{
-    setSearch("");
-    const today=getToday();
-    setFromDate(today);
-    setToDate(today);
-  }}
-  className="bg-purple-500 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm flex items-center gap-2"
->
-  🔄 Refresh
-</button>
+//           <button
+//   onClick={()=>{
+//     setSearch("");
+//     const today=getToday();
+//     setFromDate(today);
+//     setToDate(today);
+//   }}
+//   className="bg-purple-500 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+// >
+//   🔄 Refresh
+// </button>
 
         </div>
 
@@ -280,6 +280,17 @@ Development Tasks Report
 
     {/* RIGHT SIDE BUTTONS */}
     <div className="flex items-end gap-3">
+      <button
+  onClick={()=>{
+    setSearch("");
+    const today=getToday();
+    setFromDate(today);
+    setToDate(today);
+  }}
+  className="bg-purple-500 text-white px-2 py-2 rounded-lg text-sm hover:bg-purple-700 shadow"
+>
+  🔄 Refresh
+</button>
 
       <button
         onClick={handlePrint}
