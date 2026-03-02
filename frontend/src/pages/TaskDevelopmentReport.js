@@ -182,145 +182,185 @@ ${rows}
 
   return (
 
-    <AdminLayout>
+  <AdminLayout>
 
-      <div className="max-w-6xl mx-auto p-4">
+    <div className="max-w-5xl mx-auto px-6 py-6">
 
-        <h1 className="text-xl sm:text-2xl font-bold mb-6">
-          Task Development Report
-        </h1>
+      {/* TITLE */}
+      <h1 className="text-2xl font-semibold text-gray-800 mb-6">
+        Task Development Report
+      </h1>
 
-        {/* FILTER CARD */}
-        <div className="bg-white border rounded-2xl p-4 sm:p-6 shadow mb-6">
 
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+      {/* FILTER CARD */}
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm px-6 py-5 mb-6">
 
-            <div className="flex flex-wrap items-end gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
 
-              <div>
-                <label className="text-sm text-gray-600">
-                  From
-                </label>
-                <input
-                  type="date"
-                  value={fromDate}
-                  onChange={(e)=>setFromDate(e.target.value)}
-                  className="border rounded-lg px-3 py-2 text-sm w-[160px]"
-                />
-              </div>
+          <div className="flex flex-wrap items-center gap-5">
 
-              <div>
-                <label className="text-sm text-gray-600">
-                  To
-                </label>
-                <input
-                  type="date"
-                  value={toDate}
-                  onChange={(e)=>setToDate(e.target.value)}
-                  className="border rounded-lg px-3 py-2 text-sm w-[160px]"
-                />
-              </div>
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">
+                From
+              </label>
 
-              <div>
-                <label className="text-sm text-gray-600">
-                  Search
-                </label>
-                <input
-                  value={search}
-                  onChange={(e)=>setSearch(e.target.value)}
-                  placeholder="Search task"
-                  className="border rounded-lg px-3 py-2 text-sm w-[220px]"
-                />
-              </div>
-
+              <input
+                type="date"
+                value={fromDate}
+                onChange={(e)=>setFromDate(e.target.value)}
+                className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm w-[180px] focus:outline-none focus:ring-1 focus:ring-gray-400"
+              />
             </div>
 
-            <div className="flex gap-3">
 
-              <button
-                onClick={handlePrint}
-                className="bg-red-600 text-white px-5 py-2 rounded-lg text-sm"
-              >
-                Print
-              </button>
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">
+                To
+              </label>
 
-              <button
-                onClick={handleExportCSV}
-                className="bg-green-600 text-white px-5 py-2 rounded-lg text-sm"
-              >
-                Export
-              </button>
-
+              <input
+                type="date"
+                value={toDate}
+                onChange={(e)=>setToDate(e.target.value)}
+                className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm w-[180px] focus:outline-none focus:ring-1 focus:ring-gray-400"
+              />
             </div>
+
+
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">
+                Search
+              </label>
+
+              <input
+                value={search}
+                onChange={(e)=>setSearch(e.target.value)}
+                placeholder="Search task"
+                className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm w-[240px] focus:outline-none focus:ring-1 focus:ring-gray-400"
+              />
+            </div>
+
+          </div>
+
+
+          {/* BUTTONS */}
+          <div className="flex gap-3">
+
+            <button
+              onClick={handlePrint}
+              className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg text-sm font-medium"
+            >
+              Print
+            </button>
+
+
+            <button
+              onClick={handleExportCSV}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm font-medium"
+            >
+              Export
+            </button>
 
           </div>
 
         </div>
 
-        <div className="text-sm text-gray-500 mb-3">
-          Total Tasks: {filtered.length}
-        </div>
+      </div>
 
-        {/* TABLE */}
-        <div className="overflow-x-auto bg-white rounded-xl shadow">
 
-          <table className="w-full">
+      {/* TOTAL */}
+      <div className="text-sm text-gray-500 mb-3">
+        Total Tasks: {filtered.length}
+      </div>
 
-            <thead className="bg-gray-50">
 
-              <tr>
-                <th className="p-3 text-left text-sm">ID</th>
-                <th className="p-3 text-left text-sm">Title</th>
-                <th className="p-3 text-left text-sm">Status</th>
-                <th className="p-3 text-left text-sm">Hours</th>
-                <th className="p-3 text-left text-sm">Date</th>
+      {/* TABLE */}
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+
+        <table className="w-full text-sm">
+
+          <thead className="bg-gray-50">
+
+            <tr>
+
+              <th className="px-6 py-3 text-left font-semibold text-gray-700">
+                ID
+              </th>
+
+              <th className="px-6 py-3 text-left font-semibold text-gray-700">
+                Title
+              </th>
+
+              <th className="px-6 py-3 text-left font-semibold text-gray-700">
+                Status
+              </th>
+
+              <th className="px-6 py-3 text-left font-semibold text-gray-700">
+                Hours
+              </th>
+
+              <th className="px-6 py-3 text-left font-semibold text-gray-700">
+                Date
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            {filtered.map(task => (
+
+              <tr
+                key={task.id}
+                className="border-t hover:bg-gray-50"
+              >
+
+                <td className="px-6 py-3">
+                  TD{String(task.id).padStart(3,"0")}
+                </td>
+
+
+                <td className="px-6 py-3 font-medium text-gray-800">
+                  {task.title}
+                </td>
+
+
+                <td className="px-6 py-3">
+
+                  <span className={`px-2 py-1 text-xs rounded-md font-medium ${getStatusColor(task.status)}`}>
+                    {task.status}
+                  </span>
+
+                </td>
+
+
+                <td className="px-6 py-3">
+                  {formatHours(task.allotted_hours)}
+                </td>
+
+
+                <td className="px-6 py-3">
+                  {formatDate(task.due_date)}
+                </td>
+
+
               </tr>
 
-            </thead>
+            ))}
 
-            <tbody>
+          </tbody>
 
-              {filtered.map(task => (
-
-                <tr key={task.id} className="border-t">
-
-                  <td className="p-3 text-sm">
-                    TD{String(task.id).padStart(3,"0")}
-                  </td>
-
-                  <td className="p-3 text-sm font-medium">
-                    {task.title}
-                  </td>
-
-                  <td className="p-3">
-                    <span className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}>
-                      {task.status}
-                    </span>
-                  </td>
-
-                  <td className="p-3 text-sm">
-                    {formatHours(task.allotted_hours)}
-                  </td>
-
-                  <td className="p-3 text-sm">
-                    {formatDate(task.due_date)}
-                  </td>
-
-                </tr>
-
-              ))}
-
-            </tbody>
-
-          </table>
-
-        </div>
+        </table>
 
       </div>
 
-    </AdminLayout>
+    </div>
 
-  );
+  </AdminLayout>
+
+);
 
 }
 
