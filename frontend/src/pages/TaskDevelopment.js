@@ -10,6 +10,18 @@ function TaskDevelopment() {
   const getToday = () => {
   return new Date().toISOString().split("T")[0];
 };
+const formatDate = (dateString) => {
+  if (!dateString) return "-";
+
+  const d = new Date(dateString);
+
+  const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+  ];
+
+  return `${String(d.getDate()).padStart(2,"0")}/${months[d.getMonth()]}/${d.getFullYear()}`;
+};
 
   const [form, setForm] = useState({
     title: "",
@@ -262,9 +274,7 @@ function TaskDevelopment() {
           <p><strong>Status:</strong> {task.status}</p>
           <p>
             <strong>Date:</strong>
-              {task.due_date
-  ? new Date(task.due_date).toLocaleDateString("en-IN")
-  : "-"}
+              {formatDate(task.due_date)}
             </p>
           <p>
             <strong>Hours:</strong> {task.allotted_hours
@@ -329,9 +339,7 @@ function TaskDevelopment() {
             <td className="px-2">{task.priority}</td> */}
             <td className="px-2">{task.status}</td>
             <td className="px-2">
-              {task.due_date
-  ? new Date(task.due_date).toLocaleDateString("en-IN")
-  : "-"}
+              {formatDate(task.due_date)}
             </td>
             <td className="px-2">
               {task.allotted_hours

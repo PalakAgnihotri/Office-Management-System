@@ -21,6 +21,18 @@ function Notes() {
       console.log(err);
     }
   };
+  const formatDate = (dateString) => {
+  if (!dateString) return "-";
+
+  const d = new Date(dateString);
+
+  const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+  ];
+
+  return `${String(d.getDate()).padStart(2,"0")}/${months[d.getMonth()]}/${d.getFullYear()}`;
+};
 
   const handleSave = async () => {
     if (!title || !category || !content) {
@@ -138,7 +150,7 @@ function Notes() {
 
               <p className="text-sm text-gray-600">
                 Date:{" "}
-                {new Date(note.created_at).toLocaleDateString()}
+                {formatDate(note.created_at)}
               </p>
 
               <button
@@ -169,7 +181,7 @@ function Notes() {
                   <td className="py-3">{note.title}</td>
                   <td>{note.category}</td>
                   <td>
-                    {new Date(note.created_at).toLocaleDateString()}
+                    {formatDate(note.created_at)}
                   </td>
                   <td>
                     <button

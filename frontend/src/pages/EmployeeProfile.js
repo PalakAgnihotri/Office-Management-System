@@ -3,6 +3,7 @@ import API from "../services/api";
 import EmployeeLayout from "../layouts/EmployeeLayout";
 
 function EmployeeProfile() {
+
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
@@ -18,6 +19,20 @@ function EmployeeProfile() {
     }
   };
 
+  /* DATE FORMAT */
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+
+    const d = new Date(dateString);
+
+    const months = [
+      "Jan","Feb","Mar","Apr","May","Jun",
+      "Jul","Aug","Sep","Oct","Nov","Dec"
+    ];
+
+    return `${String(d.getDate()).padStart(2,"0")}/${months[d.getMonth()]}/${d.getFullYear()}`;
+  };
+
   if (!profile) {
     return (
       <EmployeeLayout>
@@ -27,50 +42,67 @@ function EmployeeProfile() {
   }
 
   return (
+
     <EmployeeLayout>
-      <h1 className="text-3xl font-bold mb-8">My Profile</h1>
+
+      <h1 className="text-3xl font-bold mb-8">
+        My Profile
+      </h1>
 
       <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-xl shadow max-w-xl">
 
         <div className="mb-4">
           <p className="text-gray-500">Name</p>
-          <p className="font-semibold">{profile.name || "N/A"}</p>
+          <p className="font-semibold">
+            {profile.name || "N/A"}
+          </p>
         </div>
 
         <div className="mb-4">
           <p className="text-gray-500">Email</p>
-          <p className="font-semibold">{profile.email}</p>
+          <p className="font-semibold">
+            {profile.email || "N/A"}
+          </p>
         </div>
 
         <div className="mb-4">
           <p className="text-gray-500">Phone</p>
-          <p className="font-semibold">{profile.phone || "N/A"}</p>
+          <p className="font-semibold">
+            {profile.phone || "N/A"}
+          </p>
         </div>
 
         <div className="mb-4">
           <p className="text-gray-500">Department</p>
-          <p className="font-semibold">{profile.department || "N/A"}</p>
+          <p className="font-semibold">
+            {profile.department || "N/A"}
+          </p>
         </div>
 
         <div className="mb-4">
           <p className="text-gray-500">Designation</p>
-          <p className="font-semibold">{profile.designation || "N/A"}</p>
+          <p className="font-semibold">
+            {profile.designation || "N/A"}
+          </p>
         </div>
 
         <div className="mb-4">
-  <p className="text-gray-500">Joining Date</p>
-  <p className="font-semibold">
-    {profile.joining_date
-      ? new Date(profile.joining_date)
-          .toLocaleDateString("en-GB")  
-          .replaceAll("/", "-")         
-      : "N/A"}
-  </p>
-</div>
+          <p className="text-gray-500">
+            Joining Date
+          </p>
+
+          <p className="font-semibold">
+            {formatDate(profile.joining_date)}
+          </p>
+
+        </div>
 
       </div>
+
     </EmployeeLayout>
+
   );
+
 }
 
 export default EmployeeProfile;
