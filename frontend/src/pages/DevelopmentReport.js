@@ -240,69 +240,80 @@ ${rows}
 
 <EmployeeLayout>
 
-<div className="max-w-6xl mx-auto">
+<div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
 
-<h1 className="text-xl sm:text-2xl font-bold mb-6">
+{/* TITLE */}
+<h1 className="text-xl sm:text-2xl font-semibold mb-6">
 Development Tasks Report
 </h1>
+
 
 {/* FILTER CARD */}
 <div className="bg-white border rounded-2xl p-4 sm:p-6 shadow mb-6">
 
-<div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+<div className="flex flex-col lg:flex-row gap-4 lg:items-end lg:justify-between">
 
-<div className="flex flex-wrap items-end gap-4">
+{/* INPUT GRID */}
+<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
 
 <div>
 <label className="text-sm text-gray-600">
 From
 </label>
+
 <input
 type="date"
 value={fromDate}
 onChange={(e)=>setFromDate(e.target.value)}
-className="border rounded-lg px-3 py-2 text-sm w-[160px]"
+className="border rounded-lg px-3 py-2 w-full"
 />
 </div>
+
 
 <div>
 <label className="text-sm text-gray-600">
 To
 </label>
+
 <input
 type="date"
 value={toDate}
 onChange={(e)=>setToDate(e.target.value)}
-className="border rounded-lg px-3 py-2 text-sm w-[160px]"
+className="border rounded-lg px-3 py-2 w-full"
 />
 </div>
+
 
 <div>
 <label className="text-sm text-gray-600">
 Search
 </label>
+
 <input
 value={search}
 onChange={(e)=>setSearch(e.target.value)}
 placeholder="Search task"
-className="border rounded-lg px-3 py-2 text-sm w-[220px]"
+className="border rounded-lg px-3 py-2 w-full"
 />
 </div>
 
 </div>
 
-<div className="flex gap-3">
+
+{/* BUTTONS */}
+<div className="flex gap-3 w-full sm:w-auto">
 
 <button
 onClick={handlePrint}
-className="bg-red-700 text-white px-5 py-2 rounded-lg text-sm"
+className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg w-full sm:w-auto"
 >
 Print
 </button>
 
+
 <button
 onClick={handleExportCSV}
-className="bg-green-600 text-white px-5 py-2 rounded-lg text-sm"
+className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg w-full sm:w-auto"
 >
 Export
 </button>
@@ -313,46 +324,68 @@ Export
 
 </div>
 
-<div className="text-sm text-gray-500 mb-2">
+
+{/* TOTAL */}
+<div className="text-sm text-gray-500 mb-4">
 Total Tasks: {combinedTasks.length}
 </div>
 
-{/* MOBILE */}
+
+
+{/* ================= MOBILE VIEW ================= */}
 <div className="sm:hidden space-y-4">
+
+{combinedTasks.length === 0 && (
+<div className="text-center text-gray-400 py-6">
+No tasks found
+</div>
+)}
 
 {combinedTasks.map(task => (
 
 <div
 key={task.id}
-className="border rounded-xl p-4 shadow bg-white"
+className="bg-white border rounded-xl shadow p-4"
 >
 
-<div className="flex justify-between">
+<div className="flex justify-between items-start">
 
-<h2 className="font-semibold">
+<div>
+<h2 className="font-semibold text-base">
 {task.title}
 </h2>
 
-<span
-className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}
->
+<p className="text-xs text-gray-500">
+ID: TD{String(task.id).padStart(3,"0")}
+</p>
+</div>
+
+<span className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}>
 {task.status}
 </span>
 
 </div>
 
-<div className="text-sm mt-2 space-y-1">
 
-<div>
-Hours:
-{task.allotted_hours
-? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
-: "-"
-}
+<div className="grid grid-cols-2 gap-y-2 mt-3 text-sm">
+
+<div className="text-gray-500">
+Hours
 </div>
 
-<div>
-Date: {formatDate(task.displayDate)}
+<div className="text-right font-medium">
+{task.allotted_hours
+? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
+: "-"}
+</div>
+
+
+<div className="text-gray-500">
+Date
+</div>
+
+<div className="text-right font-medium">
+{formatDate(task.displayDate)}
 </div>
 
 </div>
@@ -363,19 +396,21 @@ Date: {formatDate(task.displayDate)}
 
 </div>
 
-{/* DESKTOP */}
-<div className="hidden sm:block overflow-x-auto bg-white rounded-xl shadow">
 
-<table className="w-full">
+
+{/* ================= DESKTOP TABLE ================= */}
+<div className="hidden sm:block bg-white rounded-xl shadow overflow-x-auto">
+
+<table className="w-full text-sm">
 
 <thead className="bg-gray-50">
 
 <tr>
-<th className="p-3 text-left text-sm">ID</th>
-<th className="p-3 text-left text-sm">Title</th>
-<th className="p-3 text-left text-sm">Status</th>
-<th className="p-3 text-left text-sm">Hours</th>
-<th className="p-3 text-left text-sm">Date</th>
+<th className="p-3 text-left">ID</th>
+<th className="p-3 text-left">Title</th>
+<th className="p-3 text-left">Status</th>
+<th className="p-3 text-left">Hours</th>
+<th className="p-3 text-left">Date</th>
 </tr>
 
 </thead>
@@ -384,13 +419,13 @@ Date: {formatDate(task.displayDate)}
 
 {combinedTasks.map(task => (
 
-<tr key={task.id} className="border-t">
+<tr key={task.id} className="border-t hover:bg-gray-50">
 
-<td className="p-3 text-sm">
+<td className="p-3">
 TD{String(task.id).padStart(3,"0")}
 </td>
 
-<td className="p-3 text-sm font-medium">
+<td className="p-3 font-medium">
 {task.title}
 </td>
 
@@ -400,14 +435,13 @@ TD{String(task.id).padStart(3,"0")}
 </span>
 </td>
 
-<td className="p-3 text-sm">
+<td className="p-3">
 {task.allotted_hours
 ? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
-: "-"
-}
+: "-"}
 </td>
 
-<td className="p-3 text-sm">
+<td className="p-3">
 {formatDate(task.displayDate)}
 </td>
 
@@ -421,11 +455,12 @@ TD{String(task.id).padStart(3,"0")}
 
 </div>
 
+
 </div>
 
 </EmployeeLayout>
 
-  );
+);
 
 }
 
