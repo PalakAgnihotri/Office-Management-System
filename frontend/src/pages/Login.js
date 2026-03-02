@@ -73,17 +73,6 @@ function Login() {
     "Login"
   )}
 </button>
-
-      // <p className="text-center mt-6 text-gray-600">
-      //   Don’t have an account?{" "}
-      //   <span
-      //     onClick={() => navigate("/signup")}
-      //     className="text-purple-600 font-medium cursor-pointer"
-      //   >
-      //     Sign up here
-      //   </span>
-      // </p>
-
     </AuthLayout>
   );
 }
