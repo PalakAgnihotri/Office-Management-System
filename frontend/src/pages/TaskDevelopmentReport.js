@@ -182,183 +182,238 @@ ${rows}
 
   return (
 
-  <AdminLayout>
+<AdminLayout>
 
-    <div className="max-w-5xl mx-auto px-6 py-6">
+<div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
 
-      {/* TITLE */}
-      <h1 className="text-2xl font-semibold text-gray-800 mb-6">
-        Task Development Report
-      </h1>
-
-
-      {/* FILTER CARD */}
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm px-6 py-5 mb-6">
-
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-
-          <div className="flex flex-wrap items-center gap-5">
-
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                From
-              </label>
-
-              <input
-                type="date"
-                value={fromDate}
-                onChange={(e)=>setFromDate(e.target.value)}
-                className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm w-[180px] focus:outline-none focus:ring-1 focus:ring-gray-400"
-              />
-            </div>
+{/* TITLE */}
+<h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">
+Task Development Report
+</h1>
 
 
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                To
-              </label>
+{/* FILTER CARD */}
+<div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6 mb-6">
 
-              <input
-                type="date"
-                value={toDate}
-                onChange={(e)=>setToDate(e.target.value)}
-                className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm w-[180px] focus:outline-none focus:ring-1 focus:ring-gray-400"
-              />
-            </div>
+<div className="flex flex-col lg:flex-row gap-4 lg:items-end lg:justify-between">
 
+{/* inputs */}
+<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
 
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                Search
-              </label>
+<div>
+<label className="text-sm text-gray-600">
+From
+</label>
 
-              <input
-                value={search}
-                onChange={(e)=>setSearch(e.target.value)}
-                placeholder="Search task"
-                className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm w-[240px] focus:outline-none focus:ring-1 focus:ring-gray-400"
-              />
-            </div>
-
-          </div>
+<input
+type="date"
+value={fromDate}
+onChange={(e)=>setFromDate(e.target.value)}
+className="border rounded-lg px-3 py-2 w-full"
+/>
+</div>
 
 
-          {/* BUTTONS */}
-          <div className="flex gap-3">
+<div>
+<label className="text-sm text-gray-600">
+To
+</label>
 
-            <button
-              onClick={handlePrint}
-              className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg text-sm font-medium"
-            >
-              Print
-            </button>
-
-
-            <button
-              onClick={handleExportCSV}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm font-medium"
-            >
-              Export
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
+<input
+type="date"
+value={toDate}
+onChange={(e)=>setToDate(e.target.value)}
+className="border rounded-lg px-3 py-2 w-full"
+/>
+</div>
 
 
-      {/* TOTAL */}
-      <div className="text-sm text-gray-500 mb-3">
-        Total Tasks: {filtered.length}
-      </div>
+<div>
+<label className="text-sm text-gray-600">
+Search
+</label>
+
+<input
+value={search}
+onChange={(e)=>setSearch(e.target.value)}
+placeholder="Search task"
+className="border rounded-lg px-3 py-2 w-full"
+/>
+</div>
+
+</div>
 
 
-      {/* TABLE */}
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+{/* buttons */}
+<div className="flex gap-3 w-full sm:w-auto">
 
-        <table className="w-full text-sm">
-
-          <thead className="bg-gray-50">
-
-            <tr>
-
-              <th className="px-6 py-3 text-left font-semibold text-gray-700">
-                ID
-              </th>
-
-              <th className="px-6 py-3 text-left font-semibold text-gray-700">
-                Title
-              </th>
-
-              <th className="px-6 py-3 text-left font-semibold text-gray-700">
-                Status
-              </th>
-
-              <th className="px-6 py-3 text-left font-semibold text-gray-700">
-                Hours
-              </th>
-
-              <th className="px-6 py-3 text-left font-semibold text-gray-700">
-                Date
-              </th>
-
-            </tr>
-
-          </thead>
+<button
+onClick={handlePrint}
+className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm w-full sm:w-auto"
+>
+Print
+</button>
 
 
-          <tbody>
+<button
+onClick={handleExportCSV}
+className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm w-full sm:w-auto"
+>
+Export
+</button>
 
-            {filtered.map(task => (
+</div>
 
-              <tr
-                key={task.id}
-                className="border-t hover:bg-gray-50"
-              >
+</div>
 
-                <td className="px-6 py-3">
-                  TD{String(task.id).padStart(3,"0")}
-                </td>
-
-
-                <td className="px-6 py-3 font-medium text-gray-800">
-                  {task.title}
-                </td>
+</div>
 
 
-                <td className="px-6 py-3">
-
-                  <span className={`px-2 py-1 text-xs rounded-md font-medium ${getStatusColor(task.status)}`}>
-                    {task.status}
-                  </span>
-
-                </td>
+{/* TOTAL */}
+<div className="text-sm text-gray-500 mb-4">
+Total Tasks: {filtered.length}
+</div>
 
 
-                <td className="px-6 py-3">
-                  {formatHours(task.allotted_hours)}
-                </td>
+
+{/* ================= MOBILE VIEW ================= */}
+<div className="sm:hidden space-y-4">
+
+{filtered.map(task => (
+
+<div
+key={task.id}
+className="bg-white border rounded-xl shadow p-4"
+>
+
+<div className="flex justify-between items-start">
+
+<div>
+<h2 className="font-semibold">
+{task.title}
+</h2>
+
+<p className="text-xs text-gray-500">
+ID: TD{String(task.id).padStart(3,"0")}
+</p>
+</div>
+
+<span className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}>
+{task.status}
+</span>
+
+</div>
 
 
-                <td className="px-6 py-3">
-                  {formatDate(task.due_date)}
-                </td>
+<div className="grid grid-cols-2 gap-y-2 mt-3 text-sm">
+
+<div className="text-gray-500">
+Hours
+</div>
+
+<div className="text-right font-medium">
+{formatHours(task.allotted_hours)}
+</div>
 
 
-              </tr>
+<div className="text-gray-500">
+Date
+</div>
 
-            ))}
+<div className="text-right font-medium">
+{formatDate(task.due_date)}
+</div>
 
-          </tbody>
+</div>
 
-        </table>
+</div>
 
-      </div>
+))}
 
-    </div>
+</div>
 
-  </AdminLayout>
+
+
+{/* ================= DESKTOP TABLE ================= */}
+<div className="hidden sm:block bg-white border rounded-2xl shadow overflow-x-auto">
+
+<table className="w-full text-sm">
+
+<thead className="bg-gray-50">
+
+<tr>
+
+<th className="px-6 py-3 text-left font-semibold">
+ID
+</th>
+
+<th className="px-6 py-3 text-left font-semibold">
+Title
+</th>
+
+<th className="px-6 py-3 text-left font-semibold">
+Status
+</th>
+
+<th className="px-6 py-3 text-left font-semibold">
+Hours
+</th>
+
+<th className="px-6 py-3 text-left font-semibold">
+Date
+</th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+{filtered.map(task => (
+
+<tr key={task.id} className="border-t hover:bg-gray-50">
+
+<td className="px-6 py-3">
+TD{String(task.id).padStart(3,"0")}
+</td>
+
+
+<td className="px-6 py-3 font-medium">
+{task.title}
+</td>
+
+
+<td className="px-6 py-3">
+<span className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}>
+{task.status}
+</span>
+</td>
+
+
+<td className="px-6 py-3">
+{formatHours(task.allotted_hours)}
+</td>
+
+
+<td className="px-6 py-3">
+{formatDate(task.due_date)}
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
+
+</div>
+
+</AdminLayout>
 
 );
 
