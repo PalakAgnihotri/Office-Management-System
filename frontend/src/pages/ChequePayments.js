@@ -53,6 +53,18 @@ function ChequePayments() {
     await API.delete(`/cheques/${id}`);
     fetchCheques();
   };
+  const formatDate = (dateString) => {
+  if (!dateString) return "-";
+
+  const d = new Date(dateString);
+
+  const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+  ];
+
+  return `${String(d.getDate()).padStart(2,"0")}/${months[d.getMonth()]}/${d.getFullYear()}`;
+};
 
   const filtered = cheques.filter((c) =>
     c.payee.toLowerCase().includes(search.toLowerCase())
@@ -161,7 +173,7 @@ function ChequePayments() {
           <p><strong>Bank:</strong> {c.bank}</p>
           <p>
             <strong>Date:</strong>{" "}
-            {new Date(c.cheque_date).toLocaleDateString()}
+           {formatDate(c.cheque_date)}
           </p>
         </div>
 
@@ -208,7 +220,7 @@ function ChequePayments() {
               ₹ {c.amount}
             </td>
             <td className="px-2">
-              {new Date(c.cheque_date).toLocaleDateString()}
+              {formatDate(c.cheque_date)}
             </td>
             <td className="p-4 align-middle">
   <button

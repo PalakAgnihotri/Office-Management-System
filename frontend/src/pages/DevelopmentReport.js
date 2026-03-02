@@ -4,7 +4,8 @@ import EmployeeLayout from "../layouts/EmployeeLayout";
 
 function DevelopmentReport() {
 
-  const getToday = () => new Date().toISOString().split("T")[0];
+  const getToday = () =>
+    new Date().toISOString().split("T")[0];
 
   const [tasks, setTasks] = useState([]);
   const [myTasks, setMyTasks] = useState([]);
@@ -43,45 +44,64 @@ function DevelopmentReport() {
     }
   };
 
+  /* DATE FORMAT */
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+
+    const d = new Date(dateString);
+
+    const months = [
+      "Jan","Feb","Mar","Apr","May","Jun",
+      "Jul","Aug","Sep","Oct","Nov","Dec"
+    ];
+
+    return `${String(d.getDate()).padStart(2,"0")}/${months[d.getMonth()]}/${d.getFullYear()}`;
+  };
+
   /* FILTER */
   const filtered =
-  fromDate && toDate
-    ? tasks.filter(task => {
+    tasks.filter(task => {
 
-        const titleMatch =
-          task.title?.toLowerCase()
-          .includes(search.toLowerCase());
+      const titleMatch =
+        task.title?.toLowerCase()
+        .includes(search.toLowerCase());
 
-        if (!task.due_date) return false;
+      if (!task.due_date) return false;
 
-        const taskDate =
-          new Date(task.due_date)
-          .toISOString()
-          .split("T")[0];
+      const d = new Date(task.due_date);
 
-        return (
-          titleMatch &&
-          taskDate >= fromDate &&
-          taskDate <= toDate
-        );
-      })
-    : tasks;
+      const taskDate =
+        `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+      return (
+        titleMatch &&
+        taskDate >= fromDate &&
+        taskDate <= toDate
+      );
+
+    });
 
   const filteredMyTasks =
-    fromDate && toDate
-      ? myTasks.filter(task => {
+    myTasks.filter(task => {
 
-          if (!task.work_date) return false;
+      if (!task.work_date) return false;
 
-          const titleMatch =
-            task.title?.toLowerCase().includes(search.toLowerCase());
+      const titleMatch =
+        task.title?.toLowerCase()
+        .includes(search.toLowerCase());
 
-          const taskDate =
-            new Date(task.work_date).toISOString().split("T")[0];
+      const d = new Date(task.work_date);
 
-          return titleMatch && taskDate >= fromDate && taskDate <= toDate;
-        })
-      : [];
+      const taskDate =
+        `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+      return (
+        titleMatch &&
+        taskDate >= fromDate &&
+        taskDate <= toDate
+      );
+
+    });
 
   const combinedTasks = [
 
@@ -97,65 +117,67 @@ function DevelopmentReport() {
 
   ];
 
-
   /* PRINT */
   const handlePrint = () => {
 
-    const win = window.open("", "", "width=900,height=700");
+    const win =
+      window.open("", "", "width=900,height=700");
 
-    const rows = combinedTasks.map(task => `
-      <tr>
-        <td>TD${String(task.id).padStart(3,"0")}</td>
-        <td>${task.title || ""}</td>
-        <td>${task.status || ""}</td>
-        <td>${
-          task.allotted_hours
-            ? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
-            : "-"
-        }</td>
-        <td>${
-          task.displayDate
-            ? new Date(task.displayDate).toLocaleDateString("en-GB")
-            : "-"
-        }</td>
-      </tr>
-    `).join("");
+    const rows =
+      combinedTasks.map(task => `
+<tr>
+<td>TD${String(task.id).padStart(3,"0")}</td>
+<td>${task.title || ""}</td>
+<td>${task.status || ""}</td>
+<td>${
+  task.allotted_hours
+    ? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
+    : "-"
+}</td>
+<td>${formatDate(task.displayDate)}</td>
+</tr>
+`).join("");
 
     win.document.write(`
-      <html>
-        <head>
-          <title>Development Report</title>
-          <style>
-            body { font-family: Arial; padding:20px; }
-            table { width:100%; border-collapse: collapse; }
-            th, td { border:1px solid #ddd; padding:8px; }
-            th { background:#f3f3f3; }
-          </style>
-        </head>
-        <body>
-          <h2>Development Tasks Report</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Hours</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows}
-            </tbody>
-          </table>
-        </body>
-      </html>
-    `);
+<html>
+<head>
+<title>Development Report</title>
+<style>
+body{font-family:Arial;padding:20px;}
+table{width:100%;border-collapse:collapse;}
+th,td{border:1px solid #ddd;padding:8px;}
+th{background:#f3f3f3;}
+</style>
+</head>
+<body>
+
+<h2>Development Tasks Report</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Status</th>
+<th>Hours</th>
+<th>Date</th>
+</tr>
+</thead>
+
+<tbody>
+${rows}
+</tbody>
+
+</table>
+
+</body>
+</html>
+`);
 
     win.document.close();
     win.print();
   };
-
 
   /* EXPORT CSV */
   const handleExportCSV = () => {
@@ -167,32 +189,32 @@ function DevelopmentReport() {
       combinedTasks.map(task => [
 
         `TD${String(task.id).padStart(3,"0")}`,
-
         task.title,
-
         task.status,
 
         task.allotted_hours
           ? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
           : "-",
 
-        task.displayDate
-          ? new Date(task.displayDate).toLocaleDateString("en-GB")
-          : "-"
+        formatDate(task.displayDate)
 
       ]);
 
     const csv =
       "data:text/csv;charset=utf-8," +
-      [headers, ...rows].map(r => r.join(",")).join("\n");
+      [headers, ...rows]
+      .map(r => r.join(","))
+      .join("\n");
 
-    const link = document.createElement("a");
+    const link =
+      document.createElement("a");
 
     link.href = encodeURI(csv);
-    link.download = "development_report.csv";
+    link.download =
+      "development_report.csv";
+
     link.click();
   };
-
 
   /* STATUS COLOR */
   const getStatusColor = (status) => {
@@ -211,8 +233,8 @@ function DevelopmentReport() {
       default:
         return "bg-gray-100 text-gray-700";
     }
-  };
 
+  };
 
   return (
 
@@ -224,100 +246,78 @@ function DevelopmentReport() {
 Development Tasks Report
 </h1>
 
-
-
-
 {/* FILTER CARD */}
 <div className="bg-white border rounded-2xl p-4 sm:p-6 shadow mb-6">
 
-  <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+<div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
 
-    {/* LEFT SIDE */}
-    <div className="flex flex-wrap items-end gap-4">
+<div className="flex flex-wrap items-end gap-4">
 
-      {/* FROM */}
-      <div className="flex flex-col">
-        <label className="text-sm text-gray-600 mb-1">
-          From
-        </label>
-        <input
-          type="date"
-          value={fromDate}
-          onChange={(e)=>setFromDate(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm w-[160px]"
-        />
-      </div>
+<div>
+<label className="text-sm text-gray-600">
+From
+</label>
+<input
+type="date"
+value={fromDate}
+onChange={(e)=>setFromDate(e.target.value)}
+className="border rounded-lg px-3 py-2 text-sm w-[160px]"
+/>
+</div>
 
+<div>
+<label className="text-sm text-gray-600">
+To
+</label>
+<input
+type="date"
+value={toDate}
+onChange={(e)=>setToDate(e.target.value)}
+className="border rounded-lg px-3 py-2 text-sm w-[160px]"
+/>
+</div>
 
-      {/* TO */}
-      <div className="flex flex-col">
-        <label className="text-sm text-gray-600 mb-1">
-          To
-        </label>
-        <input
-          type="date"
-          value={toDate}
-          onChange={(e)=>setToDate(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm w-[160px]"
-        />
-      </div>
-
-
-      {/* SEARCH */}
-      <div className="flex flex-col">
-        <label className="text-sm text-gray-600 mb-1">
-          Search
-        </label>
-
-        <div className="flex gap-2">
-
-          <input
-            value={search}
-            onChange={(e)=>setSearch(e.target.value)}
-            placeholder="Search task"
-            className="border rounded-lg px-3 py-2 text-sm w-[220px]"
-          />
-        </div>
-
-      </div>
-
-    </div>
-
-
-    {/* RIGHT SIDE BUTTONS */}
-    <div className="flex items-end gap-3">
-
-
-      <button
-        onClick={handlePrint}
-        className="bg-red-700 text-white px-5 py-2 rounded-lg text-sm hover:bg-purple-700 shadow"
-      >
-        Print
-      </button>
-
-      <button
-        onClick={handleExportCSV}
-        className="bg-green-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-green-700 shadow"
-      >
-        Export
-      </button>
-
-    </div>
-
-  </div>
+<div>
+<label className="text-sm text-gray-600">
+Search
+</label>
+<input
+value={search}
+onChange={(e)=>setSearch(e.target.value)}
+placeholder="Search task"
+className="border rounded-lg px-3 py-2 text-sm w-[220px]"
+/>
+</div>
 
 </div>
 
+<div className="flex gap-3">
 
-{/* COUNT */}
+<button
+onClick={handlePrint}
+className="bg-red-700 text-white px-5 py-2 rounded-lg text-sm"
+>
+Print
+</button>
+
+<button
+onClick={handleExportCSV}
+className="bg-green-600 text-white px-5 py-2 rounded-lg text-sm"
+>
+Export
+</button>
+
+</div>
+
+</div>
+
+</div>
 
 <div className="text-sm text-gray-500 mb-2">
 Total Tasks: {combinedTasks.length}
 </div>
 
-
 {/* MOBILE */}
-
 <div className="sm:hidden space-y-4">
 
 {combinedTasks.map(task => (
@@ -345,7 +345,6 @@ className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}
 
 <div>
 Hours:
-{" "}
 {task.allotted_hours
 ? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
 : "-"
@@ -353,12 +352,7 @@ Hours:
 </div>
 
 <div>
-Date:
-{" "}
-{task.displayDate
-? new Date(task.displayDate).toLocaleDateString("en-GB")
-: "-"
-}
+Date: {formatDate(task.displayDate)}
 </div>
 
 </div>
@@ -369,9 +363,7 @@ Date:
 
 </div>
 
-
 {/* DESKTOP */}
-
 <div className="hidden sm:block overflow-x-auto bg-white rounded-xl shadow">
 
 <table className="w-full">
@@ -379,39 +371,20 @@ Date:
 <thead className="bg-gray-50">
 
 <tr>
-
-<th className="p-3 text-left text-sm">
-ID
-</th>
-
-<th className="p-3 text-left text-sm">
-Title
-</th>
-
-<th className="p-3 text-left text-sm">
-Status
-</th>
-
-<th className="p-3 text-left text-sm">
-Hours
-</th>
-
-<th className="p-3 text-left text-sm">
-Date
-</th>
-
+<th className="p-3 text-left text-sm">ID</th>
+<th className="p-3 text-left text-sm">Title</th>
+<th className="p-3 text-left text-sm">Status</th>
+<th className="p-3 text-left text-sm">Hours</th>
+<th className="p-3 text-left text-sm">Date</th>
 </tr>
 
 </thead>
 
 <tbody>
 
-{combinedTasks.map(task=>(
+{combinedTasks.map(task => (
 
-<tr
-key={task.id}
-className="border-t"
->
+<tr key={task.id} className="border-t">
 
 <td className="p-3 text-sm">
 TD{String(task.id).padStart(3,"0")}
@@ -422,31 +395,20 @@ TD{String(task.id).padStart(3,"0")}
 </td>
 
 <td className="p-3">
-
-<span
-className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}
->
+<span className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}>
 {task.status}
 </span>
-
 </td>
 
 <td className="p-3 text-sm">
-
 {task.allotted_hours
 ? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
 : "-"
 }
-
 </td>
 
 <td className="p-3 text-sm">
-
-{task.displayDate
-? new Date(task.displayDate).toLocaleDateString("en-GB")
-: "-"
-}
-
+{formatDate(task.displayDate)}
 </td>
 
 </tr>
@@ -458,7 +420,6 @@ className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}
 </table>
 
 </div>
-
 
 </div>
 

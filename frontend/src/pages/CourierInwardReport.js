@@ -7,6 +7,24 @@ function CourierInwardReport() {
   const [inwards, setInwards] = useState([]);
   const [search, setSearch] = useState("");
 
+  /* DATE FORMAT */
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+
+    const d = new Date(dateString);
+
+    const months = [
+      "Jan","Feb","Mar","Apr","May","Jun",
+      "Jul","Aug","Sep","Oct","Nov","Dec"
+    ];
+
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = months[d.getMonth()];
+    const year = d.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  };
+
   useEffect(() => {
     fetchInwards();
   }, []);
@@ -14,12 +32,12 @@ function CourierInwardReport() {
   const fetchInwards = async () => {
     try {
       const res = await API.get("/courier/inward");
-      setInwards(res.data);
+      setInwards(res.data || []);
     } catch (err) {
       console.log(err);
+      setInwards([]);
     }
   };
-
 
   /* SEARCH FILTER */
   const filtered = inwards.filter((item) =>
@@ -28,7 +46,6 @@ function CourierInwardReport() {
     item.received_by?.toLowerCase().includes(search.toLowerCase())
   );
 
-
   return (
     <AdminLayout>
 
@@ -36,7 +53,6 @@ function CourierInwardReport() {
       <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6">
         Courier Inward Report
       </h1>
-
 
       <div className="bg-white p-4 sm:p-6 rounded-2xl shadow">
 
@@ -49,13 +65,13 @@ function CourierInwardReport() {
           className="border p-3 rounded-lg w-full sm:w-1/2 mb-6"
         />
 
-
-        {/* ================= MOBILE VIEW ================= */}
-
+        {/* MOBILE VIEW */}
         <div className="sm:hidden space-y-4">
 
           {filtered.length === 0 && (
-            <p className="text-gray-500">No inward courier found</p>
+            <p className="text-gray-500">
+              No inward courier found
+            </p>
           )}
 
           {filtered.map((item) => (
@@ -72,30 +88,23 @@ function CourierInwardReport() {
                 </h2>
 
                 <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
-                  {item.created_at
-                    ? new Date(item.created_at)
-                        .toLocaleDateString("en-IN")
-                    : "-"}
+                  {formatDate(item.created_at)}
                 </span>
 
               </div>
 
-
               <div className="text-sm space-y-1">
 
                 <p>
-                  <strong>From:</strong>{" "}
-                  {item.sender || "-"}
+                  <strong>From:</strong> {item.sender || "-"}
                 </p>
 
                 <p>
-                  <strong>Received By:</strong>{" "}
-                  {item.received_by || "-"}
+                  <strong>Received By:</strong> {item.received_by || "-"}
                 </p>
 
                 <p>
-                  <strong>Remarks:</strong>{" "}
-                  {item.remarks || "-"}
+                  <strong>Remarks:</strong> {item.remarks || "-"}
                 </p>
 
               </div>
@@ -106,9 +115,7 @@ function CourierInwardReport() {
 
         </div>
 
-
-        {/* ================= DESKTOP TABLE ================= */}
-
+        {/* DESKTOP TABLE */}
         <div className="hidden sm:block overflow-x-auto">
 
           <table className="w-full text-left border-collapse">
@@ -126,7 +133,6 @@ function CourierInwardReport() {
               </tr>
 
             </thead>
-
 
             <tbody>
 
@@ -154,10 +160,7 @@ function CourierInwardReport() {
                   </td>
 
                   <td className="p-4">
-                    {item.created_at
-                      ? new Date(item.created_at)
-                          .toLocaleDateString("en-IN")
-                      : "-"}
+                    {formatDate(item.created_at)}
                   </td>
 
                 </tr>
@@ -169,7 +172,6 @@ function CourierInwardReport() {
           </table>
 
         </div>
-
 
       </div>
 

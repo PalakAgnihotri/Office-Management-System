@@ -7,11 +7,32 @@ function TaskDevelopmentReport() {
   const getToday = () =>
     new Date().toISOString().split("T")[0];
 
+  /* DATE FORMAT */
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+
+    const d = new Date(dateString);
+
+    const months = [
+      "Jan","Feb","Mar","Apr","May","Jun",
+      "Jul","Aug","Sep","Oct","Nov","Dec"
+    ];
+
+    return `${String(d.getDate()).padStart(2,"0")}/${months[d.getMonth()]}/${d.getFullYear()}`;
+  };
+
+  /* HOURS FORMAT */
+  const formatHours = (mins) => {
+    if (!mins && mins !== 0) return "-";
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return `${h}h ${m}m`;
+  };
+
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState("");
   const [fromDate, setFromDate] = useState(getToday());
   const [toDate, setToDate] = useState(getToday());
-
 
   /* FETCH */
   useEffect(() => {
@@ -20,162 +41,89 @@ function TaskDevelopmentReport() {
 
   const fetchTasks = async () => {
     try {
-
-      const res =
-        await API.get("/development/all");
-
-      setTasks(
-        Array.isArray(res.data)
-          ? res.data
-          : []
-      );
-
+      const res = await API.get("/development/all");
+      setTasks(Array.isArray(res.data) ? res.data : []);
     } catch {
-
       setTasks([]);
-
     }
   };
 
-
   /* FILTER */
-  const filtered =
-    tasks.filter(task => {
+  const filtered = tasks.filter(task => {
 
-      const titleMatch =
-        task.title
-        ?.toLowerCase()
-        .includes(
-          search.toLowerCase()
-        );
+    const titleMatch =
+      task.title?.toLowerCase()
+      .includes(search.toLowerCase());
 
-      if (!task.due_date)
-        return false;
+    if (!task.due_date) return false;
 
-      const taskDate =
-        new Date(task.due_date)
-        .toISOString()
-        .split("T")[0];
+    const d = new Date(task.due_date);
 
-      return (
-        titleMatch &&
-        taskDate >= fromDate &&
-        taskDate <= toDate
-      );
+    const taskDate =
+      `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 
-    });
+    return (
+      titleMatch &&
+      taskDate >= fromDate &&
+      taskDate <= toDate
+    );
 
+  });
 
   /* STATUS COLOR */
   const getStatusColor = (status) => {
 
-  switch (status?.toLowerCase()) {
+    switch (status?.toLowerCase()) {
 
-    case "completed":
-      return "bg-green-100 text-green-700";
+      case "completed":
+        return "bg-green-100 text-green-700";
 
-    case "in-progress":
-      return "bg-yellow-100 text-yellow-700";
+      case "in-progress":
+        return "bg-yellow-100 text-yellow-700";
 
-    case "pending":
-      return "bg-red-100 text-red-700";
+      case "pending":
+        return "bg-red-100 text-red-700";
 
-    default:
-      return "bg-gray-100 text-gray-700";
-  }
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
 
-};
-
+  };
 
   /* PRINT */
   const handlePrint = () => {
 
     const win =
-      window.open(
-        "",
-        "",
-        "width=900,height=700"
-      );
+      window.open("", "", "width=900,height=700");
 
     const rows =
       filtered.map(task => `
 <tr>
-<td>
-TD${String(task.id).padStart(3,"0")}
-</td>
-
-<td>
-${task.title}
-</td>
-
-<td>
-${task.status}
-</td>
-
-<td>
-${
-task.allotted_hours
-? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
-: "-"
-}
-</td>
-
-<td>
-${
-task.due_date
-? new Date(task.due_date).toLocaleDateString("en-GB")
-: "-"
-}
-</td>
-
+<td>TD${String(task.id).padStart(3,"0")}</td>
+<td>${task.title}</td>
+<td>${task.status}</td>
+<td>${formatHours(task.allotted_hours)}</td>
+<td>${formatDate(task.due_date)}</td>
 </tr>
 `).join("");
 
     win.document.write(`
-
 <html>
-
 <head>
-
-<title>
-Task Development Report
-</title>
-
+<title>Task Development Report</title>
 <style>
-
-body{
-font-family:Arial;
-padding:20px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-}
-
-th,td{
-border:1px solid #ddd;
-padding:8px;
-}
-
-th{
-background:#f3f3f3;
-}
-
+body{font-family:Arial;padding:20px;}
+table{width:100%;border-collapse:collapse;}
+th,td{border:1px solid #ddd;padding:8px;}
+th{background:#f3f3f3;}
 </style>
-
 </head>
-
 <body>
 
-<h2>
-Task Development Report
-</h2>
+<h2>Task Development Report</h2>
 
 <table>
-
 <thead>
-
 <tr>
 <th>ID</th>
 <th>Title</th>
@@ -183,379 +131,194 @@ Task Development Report
 <th>Hours</th>
 <th>Date</th>
 </tr>
-
 </thead>
 
 <tbody>
-
 ${rows}
-
 </tbody>
 
 </table>
 
 </body>
-
 </html>
 `);
 
     win.document.close();
-
     win.print();
   };
 
-
   /* EXPORT CSV */
-  const handleExportCSV =
-    () => {
+  const handleExportCSV = () => {
 
-      const headers =
-        [
-          "ID",
-          "Title",
-          "Status",
-          "Hours",
-          "Date"
-        ];
+    const headers =
+      ["ID","Title","Status","Hours","Date"];
 
-      const rows =
-        filtered.map(task => [
+    const rows =
+      filtered.map(task => [
 
-          `TD${String(
-            task.id
-          ).padStart(3,"0")}`,
+        `TD${String(task.id).padStart(3,"0")}`,
+        task.title,
+        task.status,
+        formatHours(task.allotted_hours),
+        formatDate(task.due_date)
 
-          task.title,
+      ]);
 
-          task.status,
+    const csv =
+      "data:text/csv;charset=utf-8," +
+      [headers, ...rows]
+      .map(r => r.join(","))
+      .join("\n");
 
-          task.allotted_hours
-          ? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
-          : "-",
+    const link =
+      document.createElement("a");
 
-          task.due_date
-          ? new Date(task.due_date)
-          .toLocaleDateString("en-GB")
-          : "-"
+    link.href = encodeURI(csv);
+    link.download =
+      "task_development_report.csv";
 
-        ]);
-
-      const csv =
-        "data:text/csv;charset=utf-8," +
-        [headers,...rows]
-        .map(r => r.join(","))
-        .join("\n");
-
-      const link =
-        document.createElement("a");
-
-      link.href =
-        encodeURI(csv);
-
-      link.download =
-        "task_development_report.csv";
-
-      link.click();
-    };
-
+    link.click();
+  };
 
   return (
 
-<AdminLayout>
+    <AdminLayout>
+
+      <div className="max-w-6xl mx-auto p-4">
+
+        <h1 className="text-xl sm:text-2xl font-bold mb-6">
+          Task Development Report
+        </h1>
+
+        {/* FILTER CARD */}
+        <div className="bg-white border rounded-2xl p-4 sm:p-6 shadow mb-6">
+
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+
+            <div className="flex flex-wrap items-end gap-4">
+
+              <div>
+                <label className="text-sm text-gray-600">
+                  From
+                </label>
+                <input
+                  type="date"
+                  value={fromDate}
+                  onChange={(e)=>setFromDate(e.target.value)}
+                  className="border rounded-lg px-3 py-2 text-sm w-[160px]"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">
+                  To
+                </label>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(e)=>setToDate(e.target.value)}
+                  className="border rounded-lg px-3 py-2 text-sm w-[160px]"
+                />
+              </div>
 
-<div className="max-w-6xl mx-auto">
+              <div>
+                <label className="text-sm text-gray-600">
+                  Search
+                </label>
+                <input
+                  value={search}
+                  onChange={(e)=>setSearch(e.target.value)}
+                  placeholder="Search task"
+                  className="border rounded-lg px-3 py-2 text-sm w-[220px]"
+                />
+              </div>
 
-<h1 className="text-xl sm:text-2xl font-bold mb-6">
-Task Development Report
-</h1>
+            </div>
 
+            <div className="flex gap-3">
 
-{/* FILTER CARD */}
+              <button
+                onClick={handlePrint}
+                className="bg-red-600 text-white px-5 py-2 rounded-lg text-sm"
+              >
+                Print
+              </button>
 
-<div className="bg-white border rounded-2xl p-4 sm:p-6 shadow mb-6">
+              <button
+                onClick={handleExportCSV}
+                className="bg-green-600 text-white px-5 py-2 rounded-lg text-sm"
+              >
+                Export
+              </button>
 
-<div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+            </div>
 
+          </div>
 
-<div className="flex flex-wrap items-end gap-4">
+        </div>
 
-<div className="flex flex-col">
+        <div className="text-sm text-gray-500 mb-3">
+          Total Tasks: {filtered.length}
+        </div>
 
-<label className="text-sm text-gray-600 mb-1">
-From
-</label>
+        {/* TABLE */}
+        <div className="overflow-x-auto bg-white rounded-xl shadow">
 
-<input
-type="date"
-value={fromDate}
-onChange={(e)=>
-setFromDate(
-e.target.value
-)
-}
-className="border rounded-lg px-3 py-2 text-sm w-[160px]"
-/>
+          <table className="w-full">
 
-</div>
+            <thead className="bg-gray-50">
 
+              <tr>
+                <th className="p-3 text-left text-sm">ID</th>
+                <th className="p-3 text-left text-sm">Title</th>
+                <th className="p-3 text-left text-sm">Status</th>
+                <th className="p-3 text-left text-sm">Hours</th>
+                <th className="p-3 text-left text-sm">Date</th>
+              </tr>
 
-<div className="flex flex-col">
+            </thead>
 
-<label className="text-sm text-gray-600 mb-1">
-To
-</label>
+            <tbody>
 
-<input
-type="date"
-value={toDate}
-onChange={(e)=>
-setToDate(
-e.target.value
-)
-}
-className="border rounded-lg px-3 py-2 text-sm w-[160px]"
-/>
+              {filtered.map(task => (
 
-</div>
+                <tr key={task.id} className="border-t">
 
+                  <td className="p-3 text-sm">
+                    TD{String(task.id).padStart(3,"0")}
+                  </td>
 
-<div className="flex flex-col">
+                  <td className="p-3 text-sm font-medium">
+                    {task.title}
+                  </td>
 
-<label className="text-sm text-gray-600 mb-1">
-Search
-</label>
+                  <td className="p-3">
+                    <span className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}>
+                      {task.status}
+                    </span>
+                  </td>
 
-<input
-value={search}
-onChange={(e)=>
-setSearch(
-e.target.value
-)
-}
-placeholder="Search task"
-className="border rounded-lg px-3 py-2 text-sm w-[220px]"
-/>
+                  <td className="p-3 text-sm">
+                    {formatHours(task.allotted_hours)}
+                  </td>
 
-</div>
+                  <td className="p-3 text-sm">
+                    {formatDate(task.due_date)}
+                  </td>
 
-</div>
+                </tr>
 
+              ))}
 
-<div className="flex items-end gap-3">
+            </tbody>
 
-{/* <button
-onClick={()=>{
+          </table>
 
-setSearch("");
+        </div>
 
-const today =
-getToday();
+      </div>
 
-setFromDate(today);
-
-setToDate(today);
-
-}}
-className="bg-purple-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-purple-700"
->
-
-Refresh
-
-</button> */}
-
-
-<button
-onClick={handlePrint}
-className="bg-red-600 text-white px-5 py-2 rounded-lg text-sm"
->
-
-Print
-
-</button>
-
-
-<button
-onClick={handleExportCSV}
-className="bg-green-600 text-white px-5 py-2 rounded-lg text-sm"
->
-
-Export
-
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div className="text-sm text-gray-500 mb-2">
-Total Tasks:
-{filtered.length}
-</div>
-
-
-{/* MOBILE */}
-
-<div className="sm:hidden space-y-4">
-
-{filtered.map(task => (
-
-<div
-key={task.id}
-className="border rounded-xl p-4 shadow bg-white"
->
-
-<div className="flex justify-between">
-
-<h2 className="font-semibold">
-{task.title}
-</h2>
-
-<span className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}>
-
-{task.status}
-
-</span>
-
-</div>
-
-
-<div className="text-sm mt-2 space-y-1">
-
-<div>
-
-Hours:
-
-{task.allotted_hours
-? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
-: "-"}
-
-</div>
-
-
-<div>
-
-Date:
-
-{task.due_date
-? new Date(task.due_date)
-.toLocaleDateString("en-GB")
-: "-"}
-
-</div>
-
-</div>
-
-</div>
-
-))}
-
-</div>
-
-
-{/* DESKTOP */}
-
-<div className="hidden sm:block overflow-x-auto bg-white rounded-xl shadow">
-
-<table className="w-full">
-
-<thead className="bg-gray-50">
-
-<tr>
-
-<th className="p-3 text-left text-sm">
-ID
-</th>
-
-<th className="p-3 text-left text-sm">
-Title
-</th>
-
-<th className="p-3 text-left text-sm">
-Status
-</th>
-
-<th className="p-3 text-left text-sm">
-Hours
-</th>
-
-<th className="p-3 text-left text-sm">
-Date
-</th>
-
-</tr>
-
-</thead>
-
-
-<tbody>
-
-{filtered.map(task => (
-
-<tr
-key={task.id}
-className="border-t"
->
-
-<td className="p-3 text-sm">
-
-TD{String(task.id).padStart(3,"0")}
-
-</td>
-
-
-<td className="p-3 text-sm font-medium">
-
-{task.title}
-
-</td>
-
-
-<td className="p-3">
-
-<span className={`px-2 py-1 text-xs rounded ${getStatusColor(task.status)}`}>
-
-{task.status}
-
-</span>
-
-</td>
-
-
-<td className="p-3 text-sm">
-
-{task.allotted_hours
-? `${Math.floor(task.allotted_hours/60)}h ${task.allotted_hours%60}m`
-: "-"}
-
-</td>
-
-
-<td className="p-3 text-sm">
-
-{task.due_date
-? new Date(task.due_date)
-.toLocaleDateString("en-GB")
-: "-"}
-
-</td>
-
-</tr>
-
-))}
-
-</tbody>
-
-</table>
-
-</div>
-
-
-</div>
-
-</AdminLayout>
+    </AdminLayout>
 
   );
 

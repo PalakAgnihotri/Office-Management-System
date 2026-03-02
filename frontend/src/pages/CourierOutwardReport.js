@@ -21,6 +21,18 @@ function CourierOutwardReport() {
       console.log(err);
     }
   };
+  const formatDate = (dateString) => {
+  if (!dateString) return "-";
+
+  const d = new Date(dateString);
+
+  const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+  ];
+
+  return `${String(d.getDate()).padStart(2,"0")}/${months[d.getMonth()]}/${d.getFullYear()}`;
+};
 
 
   /* SEARCH FILTER */
@@ -78,10 +90,7 @@ function CourierOutwardReport() {
                 </h2>
 
                 <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
-                  {item.created_at
-                    ? new Date(item.created_at)
-                        .toLocaleDateString("en-IN")
-                    : "-"}
+                  {formatDate(item.created_at)}
                 </span>
 
               </div>
@@ -160,10 +169,7 @@ function CourierOutwardReport() {
                   </td>
 
                   <td className="p-4">
-                    {item.created_at
-                      ? new Date(item.created_at)
-                          .toLocaleDateString("en-IN")
-                      : "-"}
+                    {formatDate(item.created_at)}
                   </td>
 
                 </tr>

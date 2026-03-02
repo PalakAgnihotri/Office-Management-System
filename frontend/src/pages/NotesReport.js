@@ -19,6 +19,18 @@ function NotesReport() {
       console.log(err);
     }
   };
+  const formatDate = (dateString) => {
+  if (!dateString) return "-";
+
+  const d = new Date(dateString);
+
+  const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+  ];
+
+  return `${String(d.getDate()).padStart(2,"0")}/${months[d.getMonth()]}/${d.getFullYear()}`;
+};
 
   /* SEARCH FILTER */
   const filtered = notes.filter((note) =>
@@ -82,10 +94,9 @@ function NotesReport() {
 
 
               <p className="text-xs text-gray-500">
-                {note.created_at
-                  ? new Date(note.created_at)
-                      .toLocaleDateString("en-IN")
-                  : "-"}
+                {
+                  formatDate(note.created_at)
+                    }
               </p>
 
             </div>
@@ -139,10 +150,9 @@ function NotesReport() {
                   </td>
 
                   <td className="p-4">
-                    {note.created_at
-                      ? new Date(note.created_at)
-                          .toLocaleDateString("en-IN")
-                      : "-"}
+                    {
+                      formatDate(note.created_at)
+                          }
                   </td>
 
                 </tr>

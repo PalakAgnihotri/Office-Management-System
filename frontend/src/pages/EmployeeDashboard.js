@@ -39,7 +39,7 @@ function EmployeeDashboard() {
 
   const chartData = [
   { name: "Total", value: total, color: "#7c3aed" },
-  { name: "Pending", value: pending, color: "#ec4899" },
+  { name: "Pending", value: pending, color: "blue" },
   { name: "Completed", value: completed, color: "green" },
   { name: "Overdue", value: overdue, color: "red" }
 ];

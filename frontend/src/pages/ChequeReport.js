@@ -7,6 +7,24 @@ function ChequeReport() {
   const [cheques, setCheques] = useState([]);
   const [search, setSearch] = useState("");
 
+  /* DATE FORMAT FUNCTION */
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+
+    const d = new Date(dateString);
+
+    const months = [
+      "Jan","Feb","Mar","Apr","May","Jun",
+      "Jul","Aug","Sep","Oct","Nov","Dec"
+    ];
+
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = months[d.getMonth()];
+    const year = d.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  };
+
   useEffect(() => {
     fetchCheques();
   }, []);
@@ -14,9 +32,10 @@ function ChequeReport() {
   const fetchCheques = async () => {
     try {
       const res = await API.get("/cheques");
-      setCheques(res.data);
+      setCheques(res.data || []);
     } catch (err) {
       console.log(err);
+      setCheques([]);
     }
   };
 
@@ -62,12 +81,13 @@ function ChequeReport() {
         />
 
 
-        {/* ================= MOBILE VIEW ================= */}
-
+        {/* MOBILE VIEW */}
         <div className="sm:hidden space-y-4">
 
           {filtered.length === 0 && (
-            <p className="text-gray-500">No cheque records found</p>
+            <p className="text-gray-500">
+              No cheque records found
+            </p>
           )}
 
           {filtered.map((c) => (
@@ -101,10 +121,7 @@ function ChequeReport() {
                 </p>
 
                 <p>
-                  <strong>Date:</strong>{" "}
-                  {c.cheque_date
-                    ? new Date(c.cheque_date).toLocaleDateString("en-IN")
-                    : "-"}
+                  <strong>Date:</strong> {formatDate(c.cheque_date)}
                 </p>
 
               </div>
@@ -116,8 +133,7 @@ function ChequeReport() {
         </div>
 
 
-        {/* ================= DESKTOP TABLE ================= */}
-
+        {/* DESKTOP TABLE */}
         <div className="hidden sm:block overflow-x-auto">
 
           <table className="w-full text-left border-collapse">
@@ -163,10 +179,7 @@ function ChequeReport() {
                   </td>
 
                   <td className="p-4">
-                    {c.cheque_date
-                      ? new Date(c.cheque_date)
-                          .toLocaleDateString("en-IN")
-                      : "-"}
+                    {formatDate(c.cheque_date)}
                   </td>
 
                 </tr>
@@ -177,7 +190,6 @@ function ChequeReport() {
 
 
             {/* TOTAL ROW */}
-
             <tfoot>
 
               <tr className="bg-gray-50 font-semibold">

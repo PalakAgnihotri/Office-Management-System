@@ -74,6 +74,18 @@ const handleUpdate = async (id) => {
     console.log(err);
   }
 };
+const formatDate = (dateString) => {
+  if (!dateString) return "-";
+
+  const d = new Date(dateString);
+
+  const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+  ];
+
+  return `${String(d.getDate()).padStart(2,"0")}/${months[d.getMonth()]}/${d.getFullYear()}`;
+};
 
   return (
     <EmployeeLayout>
@@ -101,11 +113,7 @@ const handleUpdate = async (id) => {
         {/* DEADLINE (READ ONLY) */}
         <p className="text-sm">
           <strong>Deadline:</strong>{" "}
-          {task.due_date
-  ? new Date(task.due_date)
-      .toLocaleDateString("en-GB")
-      .replace(/\//g, "-")
-  : "N/A"}
+          {formatDate(task.due_date)}
         </p>
 
 
@@ -221,11 +229,7 @@ task.remarks || "—"
       }
     />
   ) : (
-    task.work_date
-      ? new Date(task.work_date)
-          .toLocaleDateString("en-GB")
-          .replace(/\//g, "-")
-      : "-"
+    formatDate(task.work_date)
   )}
 </p>
 
@@ -308,11 +312,7 @@ task.remarks || "—"
             <td className="p-4 font-medium">{task.title}</td>
 
             <td className="p-4">
-              {task.due_date
-  ? new Date(task.due_date)
-      .toLocaleDateString("en-GB")
-      .replace(/\//g, "-")
-  : "N/A"}
+              {formatDate(task.due_date)}
             </td>
 
             <td className="p-4">
@@ -420,11 +420,7 @@ task.remarks || "—"
 
   ) : (
 
-    task.work_date
-      ? new Date(task.work_date)
-          .toLocaleDateString("en-GB")
-          .replace(/\//g, "-")
-      : getCurrentDate()
+     formatDate(task.work_date)
 
   )}
 </td>

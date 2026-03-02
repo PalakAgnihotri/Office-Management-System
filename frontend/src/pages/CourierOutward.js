@@ -47,7 +47,18 @@ function CourierOutward() {
       console.log(err);
     }
   };
+const formatDate = (dateString) => {
+  if (!dateString) return "-";
 
+  const d = new Date(dateString);
+
+  const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+  ];
+
+  return `${String(d.getDate()).padStart(2,"0")}/${months[d.getMonth()]}/${d.getFullYear()}`;
+};
   const handleDelete = async (id) => {
     try {
       await API.delete(`/courier/outward/${id}`);
@@ -148,7 +159,7 @@ function CourierOutward() {
             #{item.courier_no}
           </h2>
           <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
-            {new Date(item.created_at).toLocaleDateString()}
+            {formatDate(item.created_at)}
           </span>
         </div>
 
@@ -195,7 +206,7 @@ function CourierOutward() {
             <td className="px-2">{item.sent_by}</td>
             <td className="px-2">{item.remarks || "-"}</td>
             <td className="px-2">
-              {new Date(item.created_at).toLocaleDateString()}
+              {formatDate(item.created_at)}
             </td>
             <td className="align-middle">
             <td>
