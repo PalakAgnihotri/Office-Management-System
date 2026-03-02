@@ -42,7 +42,7 @@ const buildPath = path.join(__dirname, "../frontend/build");
 app.use(express.static(buildPath));
 
 /* IMPORTANT: allow API routes to work */
-app.get("*", (req, res) => {
+app.get("/*", (req, res) => {
 
   if (req.originalUrl.startsWith("/api")) {
     return res.status(404).json({
