@@ -1,7 +1,9 @@
+const { sendEmail } = require("../utils/email");
 const db = require("../config/db");
 
 const createTask = async (req, res) => {
   console.log("BODY:", req.body);
+
   try {
     const {
       title,
@@ -18,10 +20,11 @@ const createTask = async (req, res) => {
       return res.status(400).json({ message: "Title is required" });
     }
 
-    await db.execute(
+    /* INSERT TASK */
+    const [result] = await db.execute(
       `INSERT INTO tasks 
-       (title, description, priority, status, due_date, allotted_hours, assigned_to, created_by,remarks)
-       VALUES (?, ?, ?, ?, ?, ?, ?,?,?)`,
+       (title, description, priority, status, due_date, allotted_hours, assigned_to, created_by, remarks)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         title,
         description || null,
@@ -30,11 +33,45 @@ const createTask = async (req, res) => {
         due_date || null,
         allotted_hours || null,
         employee_id || null,
-        
         req.user?.id || null,
         remarks || null,
       ]
     );
+
+    /* SEND EMAIL IF EMPLOYEE ASSIGNED */
+    if (employee_id) {
+
+      const [emp] = await db.execute(
+        "SELECT name, email FROM employees WHERE id = ?",
+        [employee_id]
+      );
+
+      if (emp.length) {
+
+        await sendEmail(
+          emp[0].email,
+          "New Task Assigned",
+          `
+Hello ${emp[0].name},
+
+A new task has been assigned to you.
+
+Task: ${title}
+Priority: ${priority || "Medium"}
+Due Date: ${due_date || "-"}
+
+Please login to Taskify to view the task.
+
+Regards
+Taskify System
+          `
+        );
+
+        console.log("EMAIL SENT TO:", emp[0].email);
+
+      }
+
+    }
 
     res.status(201).json({ message: "Task created successfully" });
 
@@ -86,28 +123,47 @@ console.log("JWT USER:", req.user);
 const updateTask = async (req, res) => {
   try {
     const taskId = req.params.id;
-    const { title, description, priority, status, due_date, allotted_hours, employee_id, remarks, work_date } = req.body;
 
+    const {
+      title,
+      description,
+      priority,
+      status,
+      due_date,
+      allotted_hours,
+      employee_id,
+      remarks,
+      work_date
+    } = req.body;
+
+    /* 1️⃣ Get existing task */
+    const [oldTask] = await db.execute(
+      "SELECT title, assigned_to FROM tasks WHERE id = ?",
+      [taskId]
+    );
+
+    const previousEmployee = oldTask[0]?.assigned_to;
+
+    /* 2️⃣ Update task */
     await db.execute(
       `UPDATE tasks 
        SET title=?,
-          description=?,
-          priority = ?, 
-           status = ?, 
-           due_date = ?, 
-           allotted_hours = ?,
-           assigned_to = ?,
-           remarks =?,
-           work_date =?
-           WHERE id = ?`,
+           description=?,
+           priority=?,
+           status=?,
+           due_date=?,
+           allotted_hours=?,
+           assigned_to=?,
+           remarks=?,
+           work_date=?
+       WHERE id=?`,
       [
         title,
         description || null,
         priority || "Medium",
         status || "Pending",
         due_date || null,
-        
-        allotted_hours !== undefined ? allotted_hours : null,
+        allotted_hours ?? null,
         employee_id ? parseInt(employee_id) : null,
         remarks || null,
         work_date || null,
@@ -115,11 +171,70 @@ const updateTask = async (req, res) => {
       ]
     );
 
+    /* 3️⃣ Send email if assigned */
+    if (employee_id) {
+
+      const [emp] = await db.execute(
+        "SELECT name, email FROM employees WHERE id = ?",
+        [employee_id]
+      );
+
+      if (emp.length) {
+
+        await sendEmail(
+          emp[0].email,
+          "Task Assigned",
+          `
+Hello ${emp[0].name},
+
+You have been assigned a task.
+
+Task: ${title}
+Priority: ${priority}
+Due Date: ${due_date || "-"}
+
+Please login to Taskify.
+
+Regards
+Taskify System
+          `
+        );
+      }
+    }
+
+    /* 4️⃣ Send email if reassigned */
+    if (previousEmployee && previousEmployee !== parseInt(employee_id)) {
+
+      const [oldEmp] = await db.execute(
+        "SELECT name, email FROM employees WHERE id = ?",
+        [previousEmployee]
+      );
+
+      if (oldEmp.length) {
+
+        await sendEmail(
+          oldEmp[0].email,
+          "Task Reassigned",
+          `
+Hello ${oldEmp[0].name},
+
+Task "${title}" has been reassigned to another employee.
+
+Regards
+Taskify System
+          `
+        );
+      }
+    }
+
     res.json({ message: "Task updated successfully" });
 
   } catch (error) {
+
     console.error("UPDATE ERROR:", error);
+
     res.status(500).json({ message: "Server error" });
+
   }
 };
 
@@ -266,22 +381,100 @@ const editTaskName = async (req, res) => {
 };
 const assignTask = async (req, res) => {
   try {
+
     const { employeeId, allotted_hours } = req.body;
     const taskId = req.params.id;
 
+    /* 1️⃣ Get existing task info */
+    const [taskRows] = await db.execute(
+      "SELECT title, assigned_to FROM tasks WHERE id = ?",
+      [taskId]
+    );
+
+    if (!taskRows.length) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    const task = taskRows[0];
+    const oldEmployeeId = task.assigned_to;
+
+    /* 2️⃣ Update assignment */
     await db.execute(
       "UPDATE tasks SET assigned_to = ?, allotted_hours = ? WHERE id = ?",
-      [
-        employeeId || null,
-        allotted_hours || null,
-        taskId
-      ]
+      [employeeId || null, allotted_hours || null, taskId]
     );
+
+    /* 3️⃣ Send email to NEW employee */
+    if (employeeId) {
+
+      const [emp] = await db.execute(
+        "SELECT name, email FROM employees WHERE id = ?",
+        [employeeId]
+      );
+
+      if (emp.length) {
+
+        await sendEmail(
+          emp[0].email,
+          "New Task Assigned",
+          `
+Hello ${emp[0].name},
+
+You have been assigned a new task.
+
+Task: ${task.title}
+Allotted Time: ${allotted_hours || "-"} minutes
+
+Please login to Taskify to view details.
+
+Regards
+Taskify System
+          `
+        );
+
+      }
+
+    }
+
+    /* 4️⃣ Send email to OLD employee if reassigned */
+    if (oldEmployeeId && oldEmployeeId !== employeeId) {
+
+      const [oldEmp] = await db.execute(
+        "SELECT name, email FROM employees WHERE id = ?",
+        [oldEmployeeId]
+      );
+
+      if (oldEmp.length) {
+
+        await sendEmail(
+          oldEmp[0].email,
+          "Task Reassigned",
+          `
+Hello ${oldEmp[0].name},
+
+The following task has been reassigned to another employee:
+
+Task: ${task.title}
+
+This task is no longer assigned to you.
+
+Regards
+Taskify System
+          `
+        );
+
+      }
+
+    }
 
     res.json({ message: "Task assigned successfully" });
 
   } catch (error) {
+
+    console.error(error);
+
     res.status(500).json({ error: error.message });
+
   }
 };
 const getAssignedTasks = async (req, res) => {
