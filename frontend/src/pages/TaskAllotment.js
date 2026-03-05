@@ -35,22 +35,29 @@ function TaskAllotment() {
   };
 
   const handleAssign = async (taskId) => {
-    if (!selectedEmployee) return alert("Select employee first");
+  if (!selectedEmployee) return alert("Select employee first");
 
-    try {
-      await API.put(`/tasks/update/${taskId}`, {
-        assigned_to: selectedEmployee,
-        status: "In-progress",
-      });
+  try {
 
-      alert("Task Assigned Successfully");
-      setSelectedTaskId(null);
-      setSelectedEmployee("");
-      fetchTasks();
-    } catch (err) {
-      console.log(err);
-    }
-  };
+    await API.put(`/tasks/assign/${taskId}`, {
+      employeeId: selectedEmployee,
+      allotted_hours: null
+    });
+
+    alert("Task Assigned Successfully");
+
+    setSelectedTaskId(null);
+    setSelectedEmployee("");
+
+    fetchTasks();
+
+  } catch (err) {
+
+    console.log(err);
+    alert("Failed to assign task");
+
+  }
+};
 
   return (
     <AdminLayout>
