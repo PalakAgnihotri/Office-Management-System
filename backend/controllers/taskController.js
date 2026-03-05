@@ -203,7 +203,11 @@ Taskify System
     }
 
     /* 4️⃣ Send email if reassigned */
-    if (previousEmployee && previousEmployee !== parseInt(employee_id)) {
+    if (
+  previousEmployee &&
+  employee_id &&
+  Number(previousEmployee) !== Number(employee_id)
+) {
 
       const [oldEmp] = await db.execute(
         "SELECT name, email FROM employees WHERE id = ?",
