@@ -8,13 +8,15 @@ const sendEmail = async (to, subject, text) => {
     console.log("📧 Sending email to:", to);
 
     await resend.emails.send({
-      from: "Taskify <noreply@resend.dev>",
+      from: "Taskify <onboarding@resend.dev>",
       to: [to],
       subject: subject,
       text: text
     });
 
     console.log("✅ Email sent successfully");
+    console.log("RESEND RESPONSE:", response);
+    console.log("RESEND KEY:", process.env.RESEND_API_KEY);
 
   } catch (error) {
 
