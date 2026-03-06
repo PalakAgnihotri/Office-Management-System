@@ -7,7 +7,7 @@ const sendEmail = async (to, subject, text) => {
 
     console.log("📧 Sending email to:", to);
 
-    await resend.emails.send({
+    const response = await resend.emails.send({
       from: "Taskify <onboarding@resend.dev>",
       to: [to],
       subject: subject,
