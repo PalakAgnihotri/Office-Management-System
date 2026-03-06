@@ -148,7 +148,6 @@ const updateTask = async (req, res) => {
     }
 
     const previousEmployee = oldTask[0].assigned_to;
-
     const newEmployee = employee_id ? Number(employee_id) : null;
 
     /* 2️⃣ Update task */
@@ -178,9 +177,10 @@ const updateTask = async (req, res) => {
       ]
     );
 
-    /* 3️⃣ Send email to NEW employee */
-    if (newEmployee) {
+    /* 3️⃣ If employee assignment changed */
+    if (newEmployee && Number(previousEmployee) !== Number(newEmployee)) {
 
+      /* Send email to NEW employee */
       const [emp] = await db.execute(
         "SELECT name, email FROM employees WHERE id = ?",
         [newEmployee]
@@ -216,38 +216,35 @@ Taskify System`
         }
 
       }
-    }
 
-    /* 4️⃣ Send email to OLD employee if reassigned */
-    if (
-      previousEmployee &&
-      newEmployee &&
-      Number(previousEmployee) !== Number(newEmployee)
-    ) {
+      /* Notify old employee if reassigned */
+      if (previousEmployee) {
 
-      const [oldEmp] = await db.execute(
-        "SELECT name, email FROM employees WHERE id = ?",
-        [previousEmployee]
-      );
+        const [oldEmp] = await db.execute(
+          "SELECT name, email FROM employees WHERE id = ?",
+          [previousEmployee]
+        );
 
-      if (oldEmp.length) {
+        if (oldEmp.length) {
 
-        try {
+          try {
 
-          await sendEmail(
-            oldEmp[0].email,
-            "Task Reassigned",
-            `Hello ${oldEmp[0].name},
+            await sendEmail(
+              oldEmp[0].email,
+              "Task Reassigned",
+              `Hello ${oldEmp[0].name},
 
 Task "${title}" has been reassigned to another employee.
 
 Regards
 Taskify System`
-          );
+            );
 
-        } catch (err) {
+          } catch (err) {
 
-          console.log("Email failed:", err.message);
+            console.log("Email failed:", err.message);
+
+          }
 
         }
 
@@ -265,7 +262,6 @@ Taskify System`
 
   }
 };
-
 const updateTaskStatus = async (req, res) => {
   try {
     const { status, assigned_to } = req.body;
