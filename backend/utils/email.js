@@ -1,30 +1,25 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const transporter = nodemailer.createTransport({
-  host: "74.125.24.108", // Gmail IPv4 SMTP
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async (to, subject, text) => {
   try {
+
     console.log("📧 Sending email to:", to);
 
-    const info = await transporter.sendMail({
-      from: `"Taskify" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      text
+    await resend.emails.send({
+      from: "Taskify <onboarding@resend.dev>",
+      to: [to],
+      subject: subject,
+      text: text
     });
 
-    console.log("✅ Email sent:", info.response);
+    console.log("✅ Email sent successfully");
 
   } catch (error) {
+
     console.log("❌ Email failed:", error.message);
+
   }
 };
 
