@@ -3,13 +3,11 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
-  secure: false, // use TLS
+  secure: false,
+  family: 4, // ⭐ forces IPv4 instead of IPv6
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  },
-  tls: {
-    rejectUnauthorized: false
   }
 });
 
@@ -18,14 +16,14 @@ const sendEmail = async (to, subject, text) => {
 
     console.log("📧 Sending email to:", to);
 
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"Taskify" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       text
     });
 
-    console.log("✅ Email sent successfully");
+    console.log("✅ Email sent:", info.response);
 
   } catch (error) {
 
