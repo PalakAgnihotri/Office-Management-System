@@ -490,7 +490,7 @@ Taskify System
     }
 
     /* 4️⃣ Send email to OLD employee if reassigned */
-    if (oldEmployeeId && oldEmployeeId !== employeeId) {
+    if (oldEmployeeId && Number(oldEmployeeId) !== Number(employeeId)) {
 
       const [oldEmp] = await db.execute(
         "SELECT name, email FROM employees WHERE id = ?",
