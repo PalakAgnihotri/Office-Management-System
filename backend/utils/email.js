@@ -1,10 +1,9 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
+  host: "74.125.24.108", // Gmail IPv4 SMTP
   port: 587,
   secure: false,
-  family: 4, // ⭐ forces IPv4 instead of IPv6
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
@@ -13,7 +12,6 @@ const transporter = nodemailer.createTransport({
 
 const sendEmail = async (to, subject, text) => {
   try {
-
     console.log("📧 Sending email to:", to);
 
     const info = await transporter.sendMail({
@@ -26,9 +24,7 @@ const sendEmail = async (to, subject, text) => {
     console.log("✅ Email sent:", info.response);
 
   } catch (error) {
-
     console.log("❌ Email failed:", error.message);
-
   }
 };
 
